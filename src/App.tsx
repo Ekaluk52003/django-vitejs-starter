@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import { Button } from "@/components/ui/button"
 
 const reactLogo = "react.svg"
 const viteLogo = "vite.svg"
@@ -20,7 +21,9 @@ function App() {
           <img src={reactLogoPath } className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      <h1 className="text-6xl font-bold underline">
+      Hello world!
+    </h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
@@ -30,7 +33,7 @@ function App() {
         </p>
       </div>
       <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+      <Button>Click me Now oth</Button>
       </p>
     </>
   )

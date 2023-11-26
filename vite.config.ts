@@ -1,3 +1,4 @@
+import path from "path"
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -6,14 +7,20 @@ const cssFilename = 'index.min.css'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
   publicDir:'./public',
   build:{
     rollupOptions:{
       output:{
-        assetFileNames:(file)=>{
+
+        assetFileNames:()=>{
           return `assets/css/${cssFilename}`
         },
-        entryFileNames:(file)=>{
+        entryFileNames:()=>{
           return `assets/js/[name].min.js`
         }
       }
