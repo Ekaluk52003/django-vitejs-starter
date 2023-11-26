@@ -7,11 +7,6 @@ const cssFilename = 'index.min.css'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
   publicDir:'./public',
   build:{
     rollupOptions:{
@@ -25,5 +20,10 @@ export default defineConfig({
         }
       }
     }
-  }
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
 })
