@@ -13,10 +13,10 @@ $ py install -r requirements.txt
 ### To start React-vite
 $ pnpm i
 $ pnpm run dev
-
-**For development , you must both "py manage.py runserver" and "pnpm run dev" to be able for Django to serve React-vite
+**For development , you must both "py manage.py runserver" and "pnpm run dev" to be able for Django to serve React-vite**
 Make sure to set Django setting Debg = True
 **For Build to production
 $ pnpm run build
 $ py manage.py collectstatic
-Make sure to set Django setting Debg = False
+**For buidl step , you only need to run "py manage.py runserver**
+**Make sure to set Django setting Debg = False**
