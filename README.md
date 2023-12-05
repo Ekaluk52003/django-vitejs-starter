@@ -22,8 +22,22 @@ $ py manage.py collectstatic
 **For buidl step , you only need to run "py manage.py runserver**
 **Make sure to set Django setting Debg = False**
 
-### Deploy fly.io cmd
+### Deploy fly.io
+-prepare Dockerfile
+-Build react and collectstatic
+$ pnpm run build
+$ py manage.py collectstatic
 $ fly deploy
+
+
+### fly.io command
 $ fly ssh console
+$ fly info
+
 ### Futher reading
 https://testdriven.io/blog/django-fly/
+
+
+### PG admin
+username : user@domain.com
+password :SuperSecret
