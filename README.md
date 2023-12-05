@@ -9,6 +9,7 @@ $ git clone https://github.com/Ekaluk52003/django-vitejs-starter.git
 $ py -m venv myenv
 $ myenv\Scripts\activate
 $ py install -r requirements.txt
+ py manage.py runserver
 
 ### To start React-vite
 $ pnpm i
@@ -20,3 +21,9 @@ $ pnpm run build
 $ py manage.py collectstatic
 **For buidl step , you only need to run "py manage.py runserver**
 **Make sure to set Django setting Debg = False**
+
+### Deploy fly.io cmd
+$ fly deploy
+$ fly ssh console
+### Futher reading
+https://testdriven.io/blog/django-fly/

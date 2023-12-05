@@ -26,7 +26,7 @@ return redirect(`/login?redirectTo=${pathname}`);
 return null
 
 }
-
+// @ts-expect-error find out request later //
 export const paginationLoader = async ({request}) => {
 
   const url = new URL(request.url);

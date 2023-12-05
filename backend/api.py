@@ -9,7 +9,7 @@ from django.http import FileResponse
 from django.template.loader import render_to_string
 import io
 from django.http import HttpResponse
-from ninja_auth.api import router as auth_router
+from api.api import router as auth_router
 from api.models import CustomUser
 from django.core.paginator import Paginator
 from typing import List, Any

@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
-
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(' ')
 ALLOWED_HOSTS = ['*']
 
 
@@ -146,3 +146,4 @@ MEDIA_ROOT = BASE_DIR / 'uploads/'
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 FRONTEND_URL="http://127.0.0.1:8000/"
+

@@ -10,9 +10,9 @@ import { Loader2 } from "lucide-react"
 export default function ProtectRoot() {
 
   const [loading, setloading] = useState(false);
-  const [error,   setError] = useState('');
+  // const [error,   setError] = useState('');
 
-
+// @ts-expect-error ignore //
     const  handleClick = async (event) => {
       setloading(true)
       event.preventDefault()
@@ -26,10 +26,12 @@ export default function ProtectRoot() {
         link.setAttribute("download", "abc.pdf");
         document.body.appendChild(link);
         link.click();
+        // @ts-expect-error ignore //
         link.parentNode.removeChild(link);
         setloading(false)}).catch((error) => {
-        error.json().then((json) => {
-             setError(json)
+
+        error.json().then(() => {
+            //  setError(json)
             setloading(false)
         })
       });

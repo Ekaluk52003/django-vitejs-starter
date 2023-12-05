@@ -8,7 +8,7 @@ django-appconf==1.0.6
 django-fsm==2.8.1
 django-fsm-log==3.1.0
 django-ninja==0.22.2
-django-ninja-auth==0.1.7
+# django-ninja-auth==0.1.7
 django-weasyprint==2.2.1
 fonttools==4.45.1
 html5lib==1.1

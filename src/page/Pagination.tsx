@@ -3,6 +3,7 @@ import { DataTable } from "@/components/data-table";
 import { columns } from "@/components/columns";
 
 export default function Pagination() {
+  // @ts-expect-error ignore //
   const { notes, page } =  useLoaderData();
 
   return (
