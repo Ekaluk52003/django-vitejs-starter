@@ -1,9 +1,9 @@
-import { Outlet, Link, useLoaderData, Form } from "react-router-dom";
+import { Outlet, Link, useLoaderData, Form,   NavLink } from "react-router-dom";
 import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Root() {
   const session = useLoaderData();
-  
+
 
   return (
     <div className='relative flex flex-col min-h-screen bg-bgColor text-textColor'>
@@ -14,9 +14,31 @@ export default function Root() {
               <nav className='flex gap-6'>
                 <Link to='/'>Home</Link>
               </nav>
-              <nav className='flex gap-6'>
-                <Link to='/protect-route'>Protected-route</Link>
-              </nav>
+
+              <NavLink
+                    to='protect-route'
+                    className={({ isActive, isPending }) =>
+                      isActive
+                        ? "dark:text-blue-500 font-semibold"
+                        : isPending
+                        ? "pending"
+                        : ""
+                    }
+                  >
+                   Protected-route
+                  </NavLink>
+                  <NavLink
+                    to='pagination'
+                    className={({ isActive, isPending }) =>
+                      isActive
+                        ? "dark:text-blue-500 font-semibold"
+                        : isPending
+                        ? "pending"
+                        : ""
+                    }
+                  >
+                  Pagination
+                  </NavLink>
             </div>
           </div>
           <div className='flex items-center  flex-1 space-x-2 justify-end'>

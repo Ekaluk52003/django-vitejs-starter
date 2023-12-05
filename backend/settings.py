@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'api',
+    'note',
+     'django_fsm_log',
 ]
 
 MIDDLEWARE = [
@@ -139,3 +142,13 @@ CSRF_COOKIE_SAMESITE = 'Strict'
 SESSION_COOKIE_SAMESITE = 'Strict'
 CSRF_COOKIE_HTTPONLY = False  # False since we will grab it via universal-cookies
 SESSION_COOKIE_HTTPONLY = True
+
+
+AUTH_USER_MODEL = "api.CustomUser"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'uploads/'
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+FRONTEND_URL="http://127.0.0.1:8000/"

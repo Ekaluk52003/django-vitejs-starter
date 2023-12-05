@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Form, useActionData, useNavigation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import {Link } from "react-router-dom";
 
 export default function Login() {
   const data = useActionData();
@@ -17,12 +18,12 @@ export default function Login() {
 
       <div className='mt-10 sm:mx-auto sm:w-full sm:max-w-sm'>
         <Form method='post' className='px-8 pt-6 pb-8 mb-4'>
-          <label className='block text-sm font-bold mb-2'>Username</label>
+          <label className='block text-sm font-bold mb-2'>Email</label>
           <div className='mb-4'>
             <input
-              type='username'
-              name='username'
-              className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+              type='email'
+              name='email'
+              className='w-full border focus:outline-none rounded py-2 px-3 mb-3  text-gray-800'
             />
           </div>
           <div className='mb-6'>
@@ -30,7 +31,7 @@ export default function Login() {
             <input
               type='password'
               name='password'
-              className='shadow appearance-none w-full py-2 px-3 mb-3 leading-tight focus:outline-none focus:shadow-outline'
+              className='w-full border focus:outline-none rounded py-2 px-3 mb-3  text-gray-800'
             />
           </div>
 
@@ -45,10 +46,12 @@ export default function Login() {
             </Button>
           )}
         </Form>
-
+       {/*
+// @ts-ignore */}
         {data && data.error && (
-          <h5 className='text-lg text-red-700'>{data.error}</h5>
-        )}
+
+          <h5 className='text-lg text-red-700'>sss</h5>        )}
+        <Link to="/forgot_password" className="flex justify-center text-base">Forgot Password</Link>
       </div>
     </div>
   );

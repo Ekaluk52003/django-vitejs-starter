@@ -5,14 +5,14 @@ import "./index.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./layouts/Root";
-import { csrfLoader, authLoader } from "./loaders";
-import { logoutAction, loginAction } from "./actions/index.ts";
+import { csrfLoader, authLoader, paginationLoader } from "./loaders";
+import { logoutAction, loginAction, uploadAction, resetPasswordAction, ForgotPasswordAction } from "./actions/index.ts";
 import Login from "./page/login";
 import ProtectPage from "./page/ProtectPage";
+import ForgotPassword from "./page/ForgotPassword.tsx";
+import PasswordReset from "./page/PasswordReset.tsx";
 import { Toaster } from "@/components/ui/toaster"
-
-
-
+import Pagination from "./page/Pagination.tsx";
 
 
 const router = createBrowserRouter([
@@ -31,7 +31,26 @@ const router = createBrowserRouter([
       {
         path: "protect-route",
         element: <ProtectPage />,
+        action:uploadAction,
         loader:authLoader
+
+      },
+      {
+        path: "password_reset/:email/:token",
+        element: <PasswordReset />,
+        action:resetPasswordAction
+
+      },
+      {
+        path: "forgot_password",
+        element: <ForgotPassword />,
+        action:ForgotPasswordAction
+
+      },
+      {
+        path: "pagination",
+        element: <Pagination />,
+        loader: paginationLoader
 
       },
     ],
