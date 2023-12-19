@@ -1,5 +1,7 @@
 import { Outlet, Link, useLoaderData, Form,   NavLink } from "react-router-dom";
 import { ModeToggle } from "@/components/mode-toggle";
+import { Toaster } from "@/components/ui/toaster"
+
 
 export default function Root() {
   const session = useLoaderData();
@@ -56,6 +58,7 @@ export default function Root() {
       </header>
       <div className='flex-1'>
         <div className='container relative'>
+        <Toaster />
           <Outlet />
         </div>
       </div>

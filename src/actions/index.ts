@@ -1,7 +1,6 @@
 import { redirect} from "react-router-dom";
 import Cookies from "universal-cookie";
 
-
 const cookies = new Cookies();
 
 export const logoutAction = async() => {
@@ -40,7 +39,7 @@ export const loginAction = async({ request}) => {
   const formData = await request.formData();
   const loginForm = Object.fromEntries(formData);
  const pathname = new URL(request.url).searchParams.get("redirectTo") || "/"
-  const reponse = await fetch('/api/login/', {
+  const reponse = await fetch('/api/v1/auth/', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -102,5 +101,56 @@ export const ForgotPasswordAction = async({ request}) => {
     return { error :"something wrong"}
   }
   return  { message :"please check your email"}
+
+}
+
+
+export const createEmemoAction = async({ request}) => {
+
+  const formData = await request.formData();
+  const ememoForm = Object.fromEntries(formData);
+console.log(ememoForm)
+  const reponse = await fetch('/api/v1/ememo/create', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": cookies.get("csrftoken"),
+      },
+      credentials: "same-origin",
+      body: JSON.stringify(ememoForm),
+    });
+  if(!reponse.ok) {
+
+    return { error :"something wrong"}
+  }
+
+  return redirect( '/');
+
+
+}
+
+export const editEmemoAction = async({ request, params}) => {
+
+  const formData = await request.formData();
+
+  const ememoForm = Object.fromEntries(formData);
+
+
+  const reponse = await fetch(`/api/v1/ememo/save/${params.ememo_id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": cookies.get("csrftoken"),
+      },
+      credentials: "same-origin",
+      body: JSON.stringify(ememoForm),
+    });
+  if(!reponse.ok) {
+
+    return { error :"something wrong"}
+  }
+
+
+  return { success :true}
 
 }

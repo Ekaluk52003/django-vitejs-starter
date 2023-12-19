@@ -1,15 +1,32 @@
 from django.db import models
-
+import os
+from uuid import uuid4
 from django_fsm import FSMField, transition
 
+
+
+
+def file_generate_upload_path(instance, filename):
+	# extentention of file
+    ext = filename.split('.')[-1]
+    # filename = '{}.{}'.format(instance.title, ext)
+    # filename
+    filename = "%s_%s.%s" % ('Django',instance.title, ext)
+
+    return f"files/{filename}"
+
 class Note(models.Model):
+
     state = FSMField(default="green", protected=True)
     title = models.CharField(max_length=100)
     content = models.CharField(max_length=100)
-    photo = models.ImageField(upload_to='images/', null=True)
+    photo = models.FileField(
+        upload_to=file_generate_upload_path,
+        blank=True,
+        null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
 
 
 class TrafficLight(models.Model):

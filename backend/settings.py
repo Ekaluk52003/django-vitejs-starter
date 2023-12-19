@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,6 +26,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'admin_interface',
+    'colorfield',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -33,8 +36,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'note',
-     'django_fsm_log',
+    'ememo',
+    'django_fsm_log',
+    'storages',
+
 ]
+X_FRAME_OPTIONS = "SAMEORIGIN"              # allows you to use modals insated of popups
+SILENCED_SYSTEM_CHECKS = ["security.W019"]  # ignores redundant warning messages
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -71,13 +79,18 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
+
+
+DATABASES = {
+    'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -140,8 +153,26 @@ SESSION_COOKIE_HTTPONLY = True
 
 AUTH_USER_MODEL = "api.CustomUser"
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'uploads/'
+FILE_UPLOAD_STORAGE = os.getenv("FILE_UPLOAD_STORAGE", default="local")
+
+if  FILE_UPLOAD_STORAGE == "local":
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'uploads/'
+
+if FILE_UPLOAD_STORAGE == "s3":
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION = 'ap-southeast-1'
+    AWS_DEFAULT_ACL = 'private'
+    #The number of seconds that a generated URL is valid for
+    # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#configuration-settings
+    AWS_QUERYSTRING_EXPIRE = 5 # seconds
+
+
+
+
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 

@@ -41,3 +41,36 @@ export const paginationLoader = async ({request}) => {
   return { notes:data, page:parseInt(pageNumber as string)}
 
   }
+
+  export const userSelectLoader = async () => {
+
+      const response = await fetch(`/api/v1/users-form`, {
+        credentials: "same-origin",
+      });
+
+      const data = await response.json()
+
+    return data
+
+    }
+
+    export const EmemoLoader = async ({ request, params }) => {
+
+      const ememo = await fetch(`/api/v1/ememo/${params.ememo_id}`, {
+        credentials: "same-origin",
+      });
+
+      const users = await fetch(`/api/v1/users`, {
+        credentials: "same-origin",
+      });
+
+      const dataEmomo = await ememo.json()
+
+      const dataUser = await users.json()
+
+    return {
+      ememo: dataEmomo,
+      user: dataUser
+    }
+
+    }

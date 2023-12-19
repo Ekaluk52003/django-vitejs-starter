@@ -10,15 +10,19 @@ from django.template.loader import render_to_string
 import io
 from django.http import HttpResponse
 from api.api import router as auth_router
+from ememo.api import router as ememo_router
 from api.models import CustomUser
 from django.core.paginator import Paginator
 from typing import List, Any
 import math
-
+from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 api = NinjaAPI(csrf=True)
 
 api.add_router('/auth/', auth_router)
+api.add_router('/ememo/', ememo_router, tags=["Ememo Routes"])
+
 class HelloSchema(Schema):
     name: str = "world"
 
@@ -31,6 +35,7 @@ class NoteIn(Schema):
     content: str
     created_at: date = None
     updated_at:date = None
+    photo : str = None
 
 
 class PaginatedNote(Schema):
@@ -40,6 +45,14 @@ class PaginatedNote(Schema):
     has_next: bool
     has_previous: bool
     results: List[NoteIn] = None
+
+class User(Schema):
+     id: str
+     fullname: str = None
+
+class UserLabel(Schema):
+     label: str
+     value: str = None
 
 @api.get("/paginate-notes",response=PaginatedNote)
 def list_notes(request,page:int=1):
@@ -56,6 +69,12 @@ def list_notes(request,page:int=1):
     response["results"] = [i for i in page_object.object_list.values()]
     return response
 
+
+
+@api.get("/get-note/{pk}", response=NoteIn)
+def get_note(request, pk: int):
+    note = get_object_or_404(Note, id=pk)
+    return note
 
 
 @api.get("/hello")
@@ -99,6 +118,26 @@ def getLight(request, pk: int):
     return {"id":  obj.state}
 
 
+@api.get("/users-form", auth=django_auth, response=List[UserLabel])
+def getUserform(request):
+    users =  CustomUser.objects.extra(select={
+          'label': 'fullname',
+    'value': 'id',
+
+        }
+        ).values(
+        'label',
+        'value'
+        )
+
+    return  users
+
+@api.get("/users", auth=django_auth, response=List[User])
+def getUser(request):
+    users =  CustomUser.objects.all()
+    return  users
+
+
 
 @api.post("/upload-note")
 def upload_note(request,  title : str = Form(...), content : str = Form(...), file: UploadedFile = File(...)):
@@ -130,3 +169,4 @@ def create_pdf(request):
     response['Content-Type'] = 'application/pdf'
     response['Content-Disposition'] = 'inline; filename="{}.pdf"'.format('abc')
     return response
+

@@ -5,14 +5,17 @@ import "./index.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./layouts/Root";
-import { csrfLoader, authLoader, paginationLoader } from "./loaders";
-import { logoutAction, loginAction, uploadAction, resetPasswordAction, ForgotPasswordAction } from "./actions/index.ts";
+import { csrfLoader, authLoader, paginationLoader, userSelectLoader, EmemoLoader } from "./loaders";
+import { logoutAction, loginAction, uploadAction, resetPasswordAction, ForgotPasswordAction,  createEmemoAction, editEmemoAction } from "./actions/index.ts";
 import Login from "./page/login";
 import ProtectPage from "./page/ProtectPage";
 import ForgotPassword from "./page/ForgotPassword.tsx";
 import PasswordReset from "./page/PasswordReset.tsx";
 import { Toaster } from "@/components/ui/toaster"
 import Pagination from "./page/Pagination.tsx";
+import Dashboard from "./page/Dashboard.tsx";
+import Submit from "./page/ememo/submit.tsx";
+import Detail from "./page/ememo/detail.tsx";
 
 
 const router = createBrowserRouter([
@@ -51,6 +54,27 @@ const router = createBrowserRouter([
         path: "pagination",
         element: <Pagination />,
         loader: paginationLoader
+
+      },
+      {
+        path: "dashboard",
+        element: <Dashboard />,
+        loader:authLoader,
+        children:[
+          {
+            path: "/dashboard/ememo/new",
+            element: <Submit />,
+            action: createEmemoAction,
+            loader:userSelectLoader
+          },
+          {
+            path: "/dashboard/ememo/:ememo_id",
+            element: <Detail />,
+            action: editEmemoAction,
+            loader:EmemoLoader
+          },
+
+        ]
 
       },
     ],

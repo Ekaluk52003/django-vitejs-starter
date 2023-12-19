@@ -3,6 +3,7 @@ asgiref==3.7.2
 Brotli==1.1.0
 cffi==1.16.0
 cssselect2==0.7.0
+dj-database-url==2.1.0
 Django==4.2.7
 django-appconf==1.0.6
 django-fsm==2.8.1
@@ -28,3 +29,4 @@ weasyprint==60.1
 webencodings==0.5.1
 whitenoise==6.6.0
 zopfli==0.2.3
+gunicorn==20.1.0

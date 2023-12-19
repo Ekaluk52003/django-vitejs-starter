@@ -9,35 +9,35 @@ export default function Login() {
   const busy = navigation.state === "submitting";
 
   return (
-    <div className='flex min-h-full flex-col justify-center px-6 py-12 lg:px-8'>
+    <div className='flex flex-col justify-center min-h-full py-12 lg:px-8'>
       <div className='sm:mx-auto sm:w-full sm:max-w-sm'>
-        <h2 className='mt-10 text-center text-2xl font-bold leading-9'>
+        <h2 className='mt-10 text-2xl font-bold leading-9 text-center'>
           Sign in to your account
         </h2>
       </div>
 
       <div className='mt-10 sm:mx-auto sm:w-full sm:max-w-sm'>
-        <Form method='post' className='px-8 pt-6 pb-8 mb-4'>
-          <label className='block text-sm font-bold mb-2'>Email</label>
+        <Form method='post' className='pt-6 pb-8 mb-4'>
+          <label className='block mb-2 text-sm font-bold'>Email</label>
           <div className='mb-4'>
             <input
               type='email'
               name='email'
-              className='w-full border focus:outline-none rounded py-2 px-3 mb-3  text-gray-800'
+              className='w-full px-3 py-2 mb-3 text-gray-800 border rounded focus:outline-none'
             />
           </div>
           <div className='mb-6'>
-            <label className='block text-sm font-bold mb-2'>Password</label>
+            <label className='block mb-2 text-sm font-bold'>Password</label>
             <input
               type='password'
               name='password'
-              className='w-full border focus:outline-none rounded py-2 px-3 mb-3  text-gray-800'
+              className='w-full px-3 py-2 mb-3 text-gray-800 border rounded focus:outline-none'
             />
           </div>
 
           {busy ? (
             <Button disabled className='w-full'>
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              <Loader2 className='w-4 h-4 mr-2 animate-spin' />
               Please wait
             </Button>
           ) : (
