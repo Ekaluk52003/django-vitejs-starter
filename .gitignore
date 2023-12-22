@@ -100,3 +100,4 @@ dmypy.json
 .pytype/
 cython_debug/
 static/
+uploads/

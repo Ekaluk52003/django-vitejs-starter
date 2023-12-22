@@ -3,8 +3,9 @@ from django.conf import settings
 from ninja.security import django_auth
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth.tokens import default_token_generator
-from ninja import NinjaAPI, Schema,  ModelSchema  ,UploadedFile, Form, File
-from .models import Ememo, FlowEmemo, Log
+from typing import List
+from ninja import NinjaAPI, ModelSchema, Schema, UploadedFile, Form, File
+from .models import Ememo, FlowEmemo, Log, EmemoMedia
 from ninja.security import django_auth
 from api.models import CustomUser
 
@@ -12,7 +13,9 @@ class EmemoSchema(ModelSchema):
     class Config:
         model = Ememo
         model_fields = "__all__"
-        model_exclude = ['assignnee','file','author', 'id', 'created_at', 'updated_at']
+        # model_exclude = ['assignnee','file','author', 'id', 'created_at', 'updated_at']
+        model_exclude = ['assignnee','author', 'id', 'created_at', 'updated_at']
+
 
 
 class Message(Schema):
@@ -39,6 +42,7 @@ class emomoUpdate(Schema):
     content: str = None
     reviewer_id :  str = None
     approver_id :  str = None
+
 
 
 @router.put('/approve/{ememo_id}', auth=django_auth )
@@ -120,14 +124,27 @@ def save(request, payload: emomoUpdate, ememo_id:int):
     ememo.save()
     return 200, {'message': 'updated success'}
 
-@router.post("/create",  auth=django_auth)
-def create_ememo(request, payload:EmemoSchema, file: UploadedFile = File(...) ):
+# @router.post("/create", auth=django_auth)
+# def create_ememo(request, data:EmemoSchema= Form(...), file:UploadedFile = None):
 
-    ememo = Ememo.objects.create(title=payload.title, content=payload.content, author=request.auth,
-                                 assignnee=request.auth, reviewer_id=payload.reviewer, approver_id=payload.approver, file=file )
+#     ememo = Ememo.objects.create(title=data.title, content=data.content, author=request.auth,
+#                                  assignnee=request.auth, reviewer_id=data.reviewer, approver_id=data.approver, file=file )
 
-    return {"id": ememo.id}
-    # return [payload.dict(), file.name]
+#     return {"id": ememo.id}
+
+@router.post("/create", auth=django_auth)
+
+def create_ememo(request, data:EmemoSchema= Form(...), files: List[UploadedFile] = None):
+
+    ememo_created = Ememo.objects.create(title=data.title, content=data.content, author=request.auth,
+                                 assignnee=request.auth, reviewer_id=data.reviewer, approver_id=data.approver )
+
+    # if files :
+    print('files', files)
+    for file in files:
+     EmemoMedia.objects.create(ememo=ememo_created, file_url=file)
+
+    return {"success": True}
 
 
 @router.get("/{ememo_id}", auth=django_auth, response={200:EmemoOut, 401: Message} )
@@ -136,3 +153,5 @@ def getEmemo(request, ememo_id: int):
     if request.auth != ememo.assignnee and request.auth != ememo.author and request.auth != ememo.reviewer and request.auth != ememo.approver    :
         return 401, {'message': 'Unauthorized'}
     return 200, ememo
+
+

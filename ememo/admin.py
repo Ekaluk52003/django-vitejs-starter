@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Ememo, FlowEmemo, Log
+from .models import Ememo, FlowEmemo, Log, EmemoMedia
 # Register your models here.
 
 
@@ -14,3 +14,7 @@ admin.site.register(Ememo,  EmemoAdmin)
 class LogAdmin(admin.ModelAdmin):
      list_display = ("description", "comment", "logBy", "ememo")
 admin.site.register(Log, LogAdmin)
+
+class EmemoMediaAdmin(admin.ModelAdmin):
+     list_display = ("ememo", "file_url")
+admin.site.register(EmemoMedia, EmemoMediaAdmin)

@@ -107,26 +107,31 @@ export const ForgotPasswordAction = async({ request}) => {
 
 export const createEmemoAction = async({ request}) => {
 
+
   const formData = await request.formData();
-  const ememoForm = Object.fromEntries(formData);
-console.log(ememoForm)
-  const reponse = await fetch('/api/v1/ememo/create', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": cookies.get("csrftoken"),
-      },
-      credentials: "same-origin",
-      body: JSON.stringify(ememoForm),
-    });
-  if(!reponse.ok) {
 
-    return { error :"something wrong"}
-  }
-
-  return redirect( '/');
+  const files = formData.get("file");
+  
+  formData.append("file", files[1]);
+  // Object.entries(files).forEach(([key, value]) => {
+  //   formData.append(key, value);
+  // });
 
 
+
+//  try { await fetch('/api/v1/ememo/create', {
+//     method: "POST",
+//     credentials: "same-origin",
+//     headers: {
+//       "X-CSRFToken": cookies.get("csrftoken"),
+//     },
+//     body:formData,
+
+// })}
+// catch(error) {
+//   console.log(error)
+// }
+// return redirect("/");
 }
 
 export const editEmemoAction = async({ request, params}) => {

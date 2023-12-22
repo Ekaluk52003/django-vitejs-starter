@@ -25,7 +25,7 @@ class Ememo(models.Model):
     reviewer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reviewer', null=True, blank=True)
     approver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='approver', null=True, blank=True)
     assignnee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='assignnee', null=True, blank=True)
-    file = models.FileField(upload_to='files/', blank=True, null=True, validators=[validate_file_size])
+    # file = models.FileField(upload_to='files/', blank=True, null=True, validators=[validate_file_size])
     action = models.TextField(choices=ActionType, blank=True, null=True, default='Save')
     step =  models.CharField(max_length=13, choices=Step, default='Drafted')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -33,6 +33,22 @@ class Ememo(models.Model):
 
     def __str__(self):
       return str(self.pk) + '-' + self.title + '-' + self.content
+
+class EmemoMedia(models.Model):
+    ememo = models.ForeignKey(
+        Ememo,
+        on_delete=models.CASCADE,
+        related_name="media",
+    )
+    file_url = models.ImageField(upload_to='files/ememo/')
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        editable=False,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
 
 class FlowEmemo(models.Model):
     source =  models.CharField(max_length=13, choices=Step)
@@ -51,4 +67,4 @@ class Log(models.Model):
     ememo =   models.ForeignKey(Ememo, on_delete=models.CASCADE, related_name='log')
     logBy =   models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     def __str__(self):
-      return self.description 
+      return self.description

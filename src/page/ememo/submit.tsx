@@ -28,7 +28,10 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useSubmit } from "react-router-dom";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 const MAX_FILE_SIZE = 100000;
 const ACCEPTED_IMAGE_TYPES = [
@@ -52,25 +55,36 @@ const formSchema = z.object({
     required_error: "Please select a approver.",
   }),
 
-  file: z
-    .instanceof(File,{message:"Please add file"})
-    .refine((files) => files.size <= MAX_FILE_SIZE, `Max file size is 1MB.`)
+  files: z
+    .any()
     .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.type),
+      (files) => files?.length >= 1 || files?.length <= 5,
+      "Image is required."
+    )
+    .refine(
+      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
+      `Max file size is 5MB.`
+    )
+    .refine(
+      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
       ".jpg, .jpeg, .png and .webp files are accepted."
-    ).optional()
+    ),
+
+  // file: z
+  //   .instanceof(File,{message:"Please add file"})
+  //   .refine((files) => files.size <= MAX_FILE_SIZE, `Max file size is 1MB.`)
+  //   .refine(
+  //     (files) => ACCEPTED_IMAGE_TYPES.includes(files?.type),
+  //     ".jpg, .jpeg, .png and .webp files are accepted."
+  //   ).optional()
 });
 type EmemoFormValues = z.infer<typeof formSchema>;
 
-
-
 export default function Submit() {
-  const data = useLoaderData()
+  const data = useLoaderData();
+  const submit = useSubmit();
+  const users = data;
 
-  const users = data 
-
-
-  console.log(data)
   const defaultValues: Partial<EmemoFormValues> = {
     title: "",
     content: "",
@@ -84,15 +98,46 @@ export default function Submit() {
     defaultValues,
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values.files);
+    const data = new FormData();
+    // data.append("file", values.file);
+    // data.append("title", values.title);
+    // data.append("content", values.content);
+    // data.append("reviewer_id", values.reviewer_id);
+    // data.append("approver_id", values.approver_id);
 
+    Object.entries(values).forEach(([key, value]) => {
+      data.append(key, value);
+    });
+
+    Object.entries(values.files).forEach(([key, value]) => {
+      data.append("files", value);
+    });
+
+
+    // data.append("file", values.file[0]);
+    // data.append("files", values.file[0]);
+    // data.append("files", values.file[1]);
+    // submit(data,{method:'post'})
+
+    const reponse = await fetch(`/api/v1/ememo/create`, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "X-CSRFToken": cookies.get("csrftoken"),
+      },
+      body: data,
+    });
+    if (!reponse.ok) {
+      console.log("something wrong");
+    }
+  }
   return (
     <div>
       <h3>Please submit contnet</h3>
 
-      <Form {...form} >
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
           <FormField
             control={form.control}
@@ -238,22 +283,23 @@ export default function Submit() {
           />
           <FormField
             control={form.control}
-            name='file'
+            name='files'
             render={({ field }) => (
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-              <FormItem>
-                <FormLabel>File</FormLabel>
-                <FormControl>
-                  <Input
-                    // accept=".jpg, .jpeg, .png, .svg, .gif, .mp4"
-                    type='file'
-                    onChange={(e) =>
-                      field.onChange(e.target.files ? e.target.files[0] : null)
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+              <div className='grid w-full max-w-sm items-center gap-1.5'>
+                <FormItem>
+                  <FormLabel>File</FormLabel>
+                  <FormControl>
+                    <Input
+                      // accept=".jpg, .jpeg, .png, .svg, .gif, .mp4"
+                      type='file'
+                      multiple
+                      onChange={(e) =>
+                        field.onChange(e.target.files ? e.target.files : null)
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               </div>
             )}
           />
