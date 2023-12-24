@@ -49,6 +49,9 @@ class EmemoMedia(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True,
     )
+    def delete(self, *arg, **kwargs):
+       self.file_url.delete()
+       super().delete(*arg, **kwargs)
 
 class FlowEmemo(models.Model):
     source =  models.CharField(max_length=13, choices=Step)

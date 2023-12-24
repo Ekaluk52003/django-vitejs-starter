@@ -10,6 +10,20 @@ export const logoutAction = async() => {
 
   return redirect("/login");
 }
+
+export const removeFileAction = async({ request, params}) => {
+  
+  await fetch(`/api/v1/ememo/media/delete/${params.ememo_id}`, {
+    method:"DELETE",
+    credentials: "same-origin",
+    headers: {
+      "X-CSRFToken": cookies.get("csrftoken"),
+    },
+  })
+
+  return null
+}
+
 // @ts-expect-error ignore //
 export async function uploadAction({ request }) {
 
@@ -107,31 +121,20 @@ export const ForgotPasswordAction = async({ request}) => {
 
 export const createEmemoAction = async({ request}) => {
 
-
   const formData = await request.formData();
 
-  const files = formData.get("file");
-  
-  formData.append("file", files[1]);
-  // Object.entries(files).forEach(([key, value]) => {
-  //   formData.append(key, value);
-  // });
+  const reponse = await fetch(`/api/v1/ememo/create`, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "X-CSRFToken": cookies.get("csrftoken"),
+    },
+    body: formData
+  });
+ const data = await reponse.json()
+ console.log(data)
 
-
-
-//  try { await fetch('/api/v1/ememo/create', {
-//     method: "POST",
-//     credentials: "same-origin",
-//     headers: {
-//       "X-CSRFToken": cookies.get("csrftoken"),
-//     },
-//     body:formData,
-
-// })}
-// catch(error) {
-//   console.log(error)
-// }
-// return redirect("/");
+return redirect(`/dashboard/ememo/${data.id}`)
 }
 
 export const editEmemoAction = async({ request, params}) => {

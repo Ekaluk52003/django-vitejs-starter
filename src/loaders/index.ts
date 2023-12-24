@@ -8,6 +8,24 @@ export const csrfLoader = async() => {
   return response.json();
 }
 
+export const redirectLogin = async() => {
+  const response = await fetch("/api/v1/auth/me", {
+    credentials: "same-origin",
+  });
+  if (response.ok) {
+    return redirect("/");
+  }
+  return null
+}
+
+
+export const userLoader = async() => {
+  const response = await fetch("/api/v1/auth/me", {
+    credentials: "same-origin",
+  });
+  return response.json();
+}
+
 // @ts-expect-error ignore //
 export const authLoader = async ({request}) => {
 const pathname = new URL(request.url).pathname
@@ -60,17 +78,25 @@ export const paginationLoader = async ({request}) => {
         credentials: "same-origin",
       });
 
-      const users = await fetch(`/api/v1/users`, {
+      const users = await fetch(`/api/v1/users-form`, {
         credentials: "same-origin",
       });
+
+      const medias = await fetch(`/api/v1/ememo/media/${params.ememo_id}`, {
+        credentials: "same-origin",
+      });
+
 
       const dataEmomo = await ememo.json()
 
       const dataUser = await users.json()
 
+      const datamedia =  await medias.json()
+
     return {
       ememo: dataEmomo,
-      user: dataUser
+      user: dataUser,
+      medias:  datamedia
     }
 
     }

@@ -1,74 +1,34 @@
-import { Outlet, Link, useLoaderData, Form,   NavLink } from "react-router-dom";
-import { ModeToggle } from "@/components/mode-toggle";
-import { Toaster } from "@/components/ui/toaster"
+import { Outlet, useLocation, useMatches } from "react-router-dom";
 
+import { Toaster } from "@/components/ui/toaster";
+
+import Header from "./header";
+import Sidebar from "./sidebar";
 
 export default function Root() {
-  const session = useLoaderData();
+
+
+  const {pathname} = useLocation();
+
+  const noHeaderSidebarRoute = pathname.split('/')[1] == "login" ||  pathname.split('/')[1] == "forgot_password" || pathname.split('/')[1] == "password_reset"  || pathname.split('/')[1] == ""
+
 
 
   return (
-    <div className='relative flex flex-col min-h-screen bg-bgColor text-textColor'>
-      <header className='sticky top-0 z-40 w-full border-b'>
-        <div className='container flex items-center space-x-4 h-14 sm:justify-between sm:space-x-0'>
-          <div className='mr-4 md:flex'>
-            <div className='flex gap-6 md:gap-10'>
-              <nav className='flex gap-6'>
-                <Link to='/'>Home</Link>
-              </nav>
+    <>
+    {!noHeaderSidebarRoute  && <Header /> }
 
-              <NavLink
-                    to='protect-route'
-                    className={({ isActive, isPending }) =>
-                      isActive
-                        ? "dark:text-blue-500 font-semibold"
-                        : isPending
-                        ? "pending"
-                        : ""
-                    }
-                  >
-                   Protected-route
-                  </NavLink>
-                  <NavLink
-                    to='pagination'
-                    className={({ isActive, isPending }) =>
-                      isActive
-                        ? "dark:text-blue-500 font-semibold"
-                        : isPending
-                        ? "pending"
-                        : ""
-                    }
-                  >
-                  Pagination
-                  </NavLink>
-            </div>
-          </div>
-          <div className='flex items-center  flex-1 space-x-2 justify-end'>
-            <ModeToggle />
-            {/*// @ts-expect-error i knoew */}
-            {session.isAuthenticated ? (
-              <Form method='post'>
-                <button type='submit'>logout</button>
-              </Form>
-            ) : (
-              <Link to='/login'>Login</Link>
-            )}
-          </div>
-        </div>
-      </header>
-      <div className='flex-1'>
-        <div className='container relative'>
+      <div className='flex h-screen overflow-hidden'>
+      {!noHeaderSidebarRoute &&  <Sidebar className='w-1/6 hidden md:block' /> }
+
         <Toaster />
+        <main className={`flex-1 ${!noHeaderSidebarRoute && 'pt-16 overflow-x-hidden overflow-y-auto' }`}>
           <Outlet />
-        </div>
+
+        </main>
+
       </div>
-      <footer className='py-6 md:px-8 md:py-0'>
-        <div className='container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row'>
-          <p className='text-sm leading-loose text-center text-muted-foreground md:text-left'>
-          <small className="text-sm font-medium leading-none">Django React Vite</small>
-          </p>
-        </div>
-      </footer>
-    </div>
+
+    </>
   );
 }

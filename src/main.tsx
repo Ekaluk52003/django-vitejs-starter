@@ -5,8 +5,8 @@ import "./index.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./layouts/Root";
-import { csrfLoader, authLoader, paginationLoader, userSelectLoader, EmemoLoader } from "./loaders";
-import { logoutAction, loginAction, uploadAction, resetPasswordAction, ForgotPasswordAction,  createEmemoAction, editEmemoAction } from "./actions/index.ts";
+import { csrfLoader, authLoader, paginationLoader, userSelectLoader, EmemoLoader, userLoader, redirectLogin } from "./loaders";
+import { logoutAction, loginAction, uploadAction, resetPasswordAction, ForgotPasswordAction,  createEmemoAction, editEmemoAction, removeFileAction } from "./actions/index.ts";
 import Login from "./page/login";
 import ProtectPage from "./page/ProtectPage";
 import ForgotPassword from "./page/ForgotPassword.tsx";
@@ -18,16 +18,19 @@ import Submit from "./page/ememo/submit.tsx";
 import Detail from "./page/ememo/detail.tsx";
 
 
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
     loader: csrfLoader,
     action: logoutAction,
+
     children: [
       {
         path: "/login",
         action: loginAction,
+        loader:redirectLogin,
         element: <Login />,
       },
       { index: true, element: <App /> },
@@ -35,7 +38,8 @@ const router = createBrowserRouter([
         path: "protect-route",
         element: <ProtectPage />,
         action:uploadAction,
-        loader:authLoader
+        loader:authLoader,
+
 
       },
       {
@@ -79,6 +83,19 @@ const router = createBrowserRouter([
       },
     ],
   },
+{
+  path: "/load-user",
+  loader: userLoader,
+},
+{
+  path: "/logout",
+  action: logoutAction,
+},
+{
+  path: "/remove-file/:ememo_id",
+  action: removeFileAction,
+}
+
 ]);
 
 

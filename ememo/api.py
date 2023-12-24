@@ -27,6 +27,11 @@ class EmemoOut(ModelSchema):
         model_fields = "__all__"
 
 
+class Emedia(Schema):
+    file_url:str
+    id:str
+
+
 
 from django.shortcuts import get_object_or_404
 
@@ -124,13 +129,6 @@ def save(request, payload: emomoUpdate, ememo_id:int):
     ememo.save()
     return 200, {'message': 'updated success'}
 
-# @router.post("/create", auth=django_auth)
-# def create_ememo(request, data:EmemoSchema= Form(...), file:UploadedFile = None):
-
-#     ememo = Ememo.objects.create(title=data.title, content=data.content, author=request.auth,
-#                                  assignnee=request.auth, reviewer_id=data.reviewer, approver_id=data.approver, file=file )
-
-#     return {"id": ememo.id}
 
 @router.post("/create", auth=django_auth)
 
@@ -139,12 +137,11 @@ def create_ememo(request, data:EmemoSchema= Form(...), files: List[UploadedFile]
     ememo_created = Ememo.objects.create(title=data.title, content=data.content, author=request.auth,
                                  assignnee=request.auth, reviewer_id=data.reviewer, approver_id=data.approver )
 
-    # if files :
-    print('files', files)
-    for file in files:
-     EmemoMedia.objects.create(ememo=ememo_created, file_url=file)
+    if files is not None :
+        for file in files:
+            EmemoMedia.objects.create(ememo=ememo_created, file_url=file)
 
-    return {"success": True}
+    return {"id":  ememo_created.pk }
 
 
 @router.get("/{ememo_id}", auth=django_auth, response={200:EmemoOut, 401: Message} )
@@ -154,4 +151,24 @@ def getEmemo(request, ememo_id: int):
         return 401, {'message': 'Unauthorized'}
     return 200, ememo
 
+@router.delete("/media/delete/{media_id}", auth=django_auth , response={200: Message, 404: Message})
+def delete_media(request, media_id: int):
+    try:
+        track = EmemoMedia.objects.get(pk=media_id)
+        track.delete()
+        return 200, {"message": "delete success"}
+    except EmemoMedia.DoesNotExist as e:
+        return 404, {"message": "Could not find media"}
+
+@router.get("/media/{ememo_id}", auth=django_auth, response=List[Emedia] )
+def ememo_media(request, ememo_id: int):
+    media = EmemoMedia.objects.filter(ememo__pk=ememo_id)
+    print(media)
+    return 200, media
+
+@router.post("/media/new/{ememo_id}", auth=django_auth )
+def create_media(request, ememo_id:int, file: UploadedFile):
+    EmemoMedia.objects.create(ememo_id=ememo_id, file_url=file)
+
+    return {"success upload":True}
 
