@@ -8,6 +8,7 @@ from ninja import NinjaAPI, ModelSchema, Schema, UploadedFile, Form, File
 from .models import Ememo, FlowEmemo, Log, EmemoMedia
 from ninja.security import django_auth
 from api.models import CustomUser
+from datetime import datetime
 
 class EmemoSchema(ModelSchema):
     class Config:
@@ -17,14 +18,30 @@ class EmemoSchema(ModelSchema):
         model_exclude = ['assignnee','author', 'id', 'created_at', 'updated_at']
 
 
+class EmemoIn(Schema):
+     title :str
+     content:str
 
 class Message(Schema):
     message: str
 
-class EmemoOut(ModelSchema):
-     class Config:
-        model = Ememo
-        model_fields = "__all__"
+class UserSchema(Schema):
+    id: int
+    fullname: str
+
+class EmemoOut(Schema):
+   id: int
+   title: str
+   content: str
+   author:  UserSchema = None
+   reviewer:  UserSchema = None
+   approver:  UserSchema = None
+   assignnee:  UserSchema = None
+   action: str
+   step: str
+   created_at: datetime
+   updated_at: datetime
+
 
 
 class Emedia(Schema):
@@ -43,10 +60,10 @@ class Comment(Schema):
 
 
 class emomoUpdate(Schema):
-    title: str = None
-    content: str = None
-    reviewer_id :  str = None
-    approver_id :  str = None
+    title: str
+    content: str
+
+
 
 
 
@@ -110,25 +127,6 @@ def revert(request, payload:Comment, ememo_id:int):
     log.ememo = ememo
     log.save()
     return 200, {'message': 'revert success'}
-@router.put('/save/{ememo_id}',  auth=django_auth, response={200:Message, 401: Message} )
-def save(request, payload: emomoUpdate, ememo_id:int):
-    # check asignnee to be done
-
-    ememo = get_object_or_404(Ememo, id=ememo_id)
-
-    if request.auth != ememo.assignnee :
-           return 401, {'message': 'Unauthorized'}
-    if ememo.step != "Drafted" :
-           return 401, {'message': 'Unauthorized'}
-    reviewer = CustomUser.objects.get(pk=payload.reviewer_id)
-    approver = CustomUser.objects.get(pk=payload.approver_id)
-    ememo.title = payload.title
-    ememo.content = payload.content
-    ememo.reviewer = reviewer
-    ememo.approver = approver
-    ememo.save()
-    return 200, {'message': 'updated success'}
-
 
 @router.post("/create", auth=django_auth)
 
@@ -144,12 +142,20 @@ def create_ememo(request, data:EmemoSchema= Form(...), files: List[UploadedFile]
     return {"id":  ememo_created.pk }
 
 
-@router.get("/{ememo_id}", auth=django_auth, response={200:EmemoOut, 401: Message} )
+
+
+@router.get("/{ememo_id}", auth=django_auth, response={200:EmemoOut, 401: Message, 404: Message} )
 def getEmemo(request, ememo_id: int):
-    ememo = get_object_or_404(Ememo, id=ememo_id)
+    try:
+       ememo = Ememo.objects.select_related('author', 'reviewer', 'approver', 'assignnee').get(id=ememo_id)
+    except Ememo.DoesNotExist as e:
+        return 404, {'message': 'Could not find ememo'}
     if request.auth != ememo.assignnee and request.auth != ememo.author and request.auth != ememo.reviewer and request.auth != ememo.approver    :
         return 401, {'message': 'Unauthorized'}
     return 200, ememo
+
+
+
 
 @router.delete("/media/delete/{media_id}", auth=django_auth , response={200: Message, 404: Message})
 def delete_media(request, media_id: int):
@@ -165,6 +171,22 @@ def ememo_media(request, ememo_id: int):
     media = EmemoMedia.objects.filter(ememo__pk=ememo_id)
     print(media)
     return 200, media
+
+@router.put("/update/{ememo_id}")
+def update_ememo(request, ememo_id: int,  form :EmemoSchema= Form(...), files: List[UploadedFile] = None):
+    ememo_update = get_object_or_404(Ememo, id=ememo_id)
+    ememo_update.title = form.title
+    ememo_update.content = form.content
+    ememo_update.reviewer_id = form.reviewer
+    ememo_update.approver_id = form.approver
+
+    if files is not None :
+        for file in files:
+            EmemoMedia.objects.create(ememo=ememo_update, file_url=file)
+
+
+    ememo_update.save()
+    return {"id": ememo_update.id}
 
 @router.post("/media/new/{ememo_id}", auth=django_auth )
 def create_media(request, ememo_id:int, file: UploadedFile):

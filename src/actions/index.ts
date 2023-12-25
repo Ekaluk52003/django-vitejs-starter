@@ -12,7 +12,7 @@ export const logoutAction = async() => {
 }
 
 export const removeFileAction = async({ request, params}) => {
-  
+
   await fetch(`/api/v1/ememo/media/delete/${params.ememo_id}`, {
     method:"DELETE",
     credentials: "same-origin",
@@ -141,22 +141,15 @@ export const editEmemoAction = async({ request, params}) => {
 
   const formData = await request.formData();
 
-  const ememoForm = Object.fromEntries(formData);
+ await fetch(`/api/v1/ememo/update/${params.ememo_id}`, {
+    method: "PUT",
+    credentials: "same-origin",
+    headers: {
+      "X-CSRFToken": cookies.get("csrftoken"),
+    },
+    body: formData
+  });
 
-
-  const reponse = await fetch(`/api/v1/ememo/save/${params.ememo_id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": cookies.get("csrftoken"),
-      },
-      credentials: "same-origin",
-      body: JSON.stringify(ememoForm),
-    });
-  if(!reponse.ok) {
-
-    return { error :"something wrong"}
-  }
 
 
   return { success :true}

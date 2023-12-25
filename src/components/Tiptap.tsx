@@ -27,7 +27,7 @@ const MenuBar = ({ editor }) => {
   }
 
   return (
-    <div className='flex flex-row items-center gap-2 p-2 mt-6 mb-0 border rounded-t-2xl'>
+    <div className='flex flex-row items-center gap-2 p-2 mb-0 border rounded-sm'>
       <div className='flex flex-wrap gap-3'>
         <Toggle
           size='sm'
@@ -196,11 +196,6 @@ export const Tiptap = ({ content, onChange }:{
           },
         },
 
-        paragraph: {
-          HTMLAttributes: {
-            class: "text-lg",
-          },
-        },
       }),
     ],
 
@@ -208,7 +203,7 @@ export const Tiptap = ({ content, onChange }:{
 
       attributes: {
         class:
-          "min-h-[280px] max-h-[380px] w-full border-x border-b rounded-b-xl border-input px-3 py-4 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 overflow-auto",
+          "min-h-[280px] max-h-[380px] w-full border-x border-b rounded-b border-input px-3 py-4 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 overflow-auto",
       },
     },
     content: content,

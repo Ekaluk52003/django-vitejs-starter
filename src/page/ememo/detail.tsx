@@ -13,25 +13,33 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
-
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+import { Input } from "@/components/ui/input";
+import dayjs from "dayjs";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-import { useLoaderData, useSubmit, useFetcher } from "react-router-dom";
+import {
+  useLoaderData,
+  useSubmit,
+  useFetcher,
+  useNavigation,
+} from "react-router-dom";
 import { Trash2, FileText } from "lucide-react";
-
+import { useToast } from "@/components/ui/use-toast";
 
 const MAX_FILE_SIZE = 100000;
 const ACCEPTED_IMAGE_TYPES = [
@@ -54,64 +62,120 @@ const formSchema = z.object({
   approver_id: z.string({
     required_error: "Please select a approver.",
   }),
+  author: z.string({
+    required_error: "Please select a reviewer.",
+  }),
+  assignnee: z.string({
+    required_error: "Please select a reviewer.",
+  }),
 
-  files: z
-    .any()
-    .refine((files) => files?.length <= 2, "File upload not more than 2 files")
-
-    .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-      ".jpg, .jpeg, .png and .webp files are accepted."
-    )
-    .optional(),
+  files: z.any(),
 });
 type EmemoFormValues = z.infer<typeof formSchema>;
 
 export default function Detail() {
   const inputRef = useRef(null);
   const data = useLoaderData();
-  const submit = useSubmit();
   const fetcher = useFetcher();
+  const submit = useSubmit();
+  const { toast } = useToast();
+  const navigation = useNavigation();
+  const busy = navigation.state === "submitting";
   const users = data.user;
   const ememo = data.ememo;
   const medias = data.medias;
 
-  console.log(medias);
-
   const defaultValues: Partial<EmemoFormValues> = {
     title: ememo.title,
     content: ememo.content,
-    approver_id: ememo.approver.toString(),
-    reviewer_id: ememo.reviewer.toString(),
+    approver_id: ememo.approver.id.toString(),
+    reviewer_id: ememo.reviewer.id.toString(),
+    author: ememo.reviewer.fullname,
+    assignnee: ememo.assignnee.fullname,
     // files: new File([], "")
   };
+
+  const createdAt = dayjs(ememo.created_at).format("dddd, MMMM D, YYYY, HH:mm");
+  const updatedAt = dayjs(ememo.updated_at).format("dddd, MMMM D, YYYY, HH:mm");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
 
+  const fileNames = form.watch("files", null);
+  const name: string[] = [];
+  if (fileNames) {
+    for (let i = 0; i < fileNames.length; i++) {
+      name.push(fileNames[i].name);
+    }
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const data = new FormData();
+    Object.entries(values).forEach(([key, value]) => {
+      data.append(key, value);
+    });
+
+    if (values.files) {
+      console.log(values.files);
+      if (values.files.length + medias.length > 5) {
+        return form.setError("files", {
+          type: "manual",
+          message: `files upload allow 5 including uploaded files.`,
+        });
+      }
+
+      for (let i = 0; i < values.files.length; i++) {
+        data.append("files", values.files[i]);
+
+        if (values.files[i].size > MAX_FILE_SIZE) {
+          return form.setError("files", {
+            type: "manual",
+            message: `${values.files[i].name} is over limit`,
+          });
+        }
+
+        if (!ACCEPTED_IMAGE_TYPES.includes(values.files[i].type)) {
+          return form.setError("files", {
+            type: "manual",
+            message: `wrong file type`,
+          });
+        }
+      }
+    }
+
+    toast({
+      title: "Saving",
+      description: "we are updating and saving information",
+    });
+
+    submit(data, {
+      method: "PUT",
+      encType: "multipart/form-data",
+    });
+    inputRef.current!.value = null;
   }
 
   return (
     <div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FormField
-            control={form.control}
-            name='title'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title</FormLabel>
-                <FormControl>
-                  <Input placeholder='shadcn' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className='mb-6'>
+            <FormField
+              control={form.control}
+              name='title'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder='shadcn' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name='content'
@@ -125,174 +189,316 @@ export default function Detail() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name='reviewer_id'
-            render={({ field }) => (
-              <FormItem className='flex flex-col'>
-                <FormLabel>Reviewer</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant='outline'
-                        role='combobox'
-                        className={cn(
-                          "w-[200px] justify-between",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value
-                          ? users.find((user) => user.value === field.value)
-                              ?.label
-                          : "Select User"}
-                        <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-[200px] p-0'>
-                    <Command>
-                      <CommandInput placeholder='Search language...' />
-                      <CommandEmpty>No User found.</CommandEmpty>
-                      <CommandGroup>
-                        {users.map((user) => (
-                          <CommandItem
-                            value={user.label}
-                            key={user.value}
-                            onSelect={() => {
-                              form.setValue("reviewer_id", user.value);
-                            }}
-                          >
-                            <CheckIcon
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                user.value === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {user.label}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+          <div>
+            <div>
+              {" "}
+              <Card className='w-full rounded-sm my-4'>
+                <CardHeader>
+                  <CardTitle>User Details</CardTitle>
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='approver_id'
-            render={({ field }) => (
-              <FormItem className='flex flex-col'>
-                <FormLabel>Approver</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant='outline'
-                        role='combobox'
-                        className={cn(
-                          "w-[200px] justify-between",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value
-                          ? users.find((user) => user.value === field.value)
-                              ?.label
-                          : "Select user"}
-                        <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-[200px] p-0'>
-                    <Command>
-                      <CommandInput placeholder='Search language...' />
-                      <CommandEmpty>No User found.</CommandEmpty>
-                      <CommandGroup>
-                        {users.map((user) => (
-                          <CommandItem
-                            value={user.label}
-                            key={user.value}
-                            onSelect={() => {
-                              form.setValue("approver_id", user.value);
-                            }}
-                          >
-                            <CheckIcon
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                user.value === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {user.label}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='files'
-            render={({ field }) => (
-              <div className='grid w-full max-w-sm items-center gap-1.5'>
-                <FormItem>
-                  <FormLabel>File</FormLabel>
-                  <FormControl>
-                    <Input
-                      ref={inputRef}
-                      // accept=".jpg, .jpeg, .png, .svg, .gif, .mp4"
-                      type='file'
-                      multiple
-                      onChange={(e) => {
-                        field.onChange(e.target.files ? e.target.files : null);
-                        // form.clearErrors("files")
-                      }}
+                  <CardContent>
+                    <FormField
+                      control={form.control}
+                      name='author'
+                      render={({ field }) => (
+                        <div className='w-[200px] p-0'>
+                          <FormItem>
+                            <FormLabel>Submited By</FormLabel>
+                            <FormControl>
+                              <Input placeholder='shadcn' {...field} disabled />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        </div>
+                      )}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </div>
-            )}
-          />
-          {medias.length > 0 &&
-            medias.map((media, id) => (
-              <div
-                key={id}
-                className='mb-2 mt-2 grid grid-cols-[25px_1fr] items-start'
-              >
-                <FileText className='w-5 h-5'  />
-                <div className='space-y-1 flex items-center'>
-                  <a
-                    href={media.file_url}
-                    className='text-sm font-medium leading-none'
-                  >
-                    {media.file_url}
-                  </a>
+                    <FormField
+                      control={form.control}
+                      name='assignnee'
+                      render={({ field }) => (
+                        <div className='w-[200px] p-0'>
+                          <FormItem>
+                            <FormLabel>Assignnee</FormLabel>
+                            <FormControl>
+                              <Input placeholder='shadcn' {...field} disabled />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        </div>
+                      )}
+                    />
 
+                    <FormField
+                      control={form.control}
+                      name='reviewer_id'
+                      render={({ field }) => (
+                        <FormItem className='flex flex-col my-6'>
+                          <FormLabel>Reviewer</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant='outline'
+                                  role='combobox'
+                                  className={cn(
+                                    "w-[200px] justify-between",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value
+                                    ? users.find(
+                                        (user) => user.value === field.value
+                                      )?.label
+                                    : "Select User"}
+                                  <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-[200px] p-0'>
+                              <Command>
+                                <CommandInput placeholder='Search language...' />
+                                <CommandEmpty>No User found.</CommandEmpty>
+                                <CommandGroup>
+                                  {users.map((user) => (
+                                    <CommandItem
+                                      value={user.label}
+                                      key={user.value}
+                                      onSelect={() => {
+                                        form.setValue(
+                                          "reviewer_id",
+                                          user.value
+                                        );
+                                      }}
+                                    >
+                                      <CheckIcon
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          user.value === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {user.label}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
 
-                  <button type='submit' onClick={()=>{
-                    fetcher.submit(null,{method:"DELETE", action:`/remove-file/${media.id}`})
-                  }}><Trash2/></button>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
+                    <FormField
+                      control={form.control}
+                      name='approver_id'
+                      render={({ field }) => (
+                        <FormItem className='flex flex-col my-6'>
+                          <FormLabel>Approver</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant='outline'
+                                  role='combobox'
+                                  className={cn(
+                                    "w-[200px] justify-between",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value
+                                    ? users.find(
+                                        (user) => user.value === field.value
+                                      )?.label
+                                    : "Select user"}
+                                  <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-[200px] p-0'>
+                              <Command>
+                                <CommandInput placeholder='Search language...' />
+                                <CommandEmpty>No User found.</CommandEmpty>
+                                <CommandGroup>
+                                  {users.map((user) => (
+                                    <CommandItem
+                                      value={user.label}
+                                      key={user.value}
+                                      onSelect={() => {
+                                        form.setValue(
+                                          "approver_id",
+                                          user.value
+                                        );
+                                      }}
+                                    >
+                                      <CheckIcon
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          user.value === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {user.label}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </CardHeader>
+              </Card>
+            </div>
+            <div>
+              {" "}
+              <Card className='w-full rounded-sm'>
+                <CardHeader>
+                  <CardTitle>Files</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name='files'
+                    render={({ field }) => (
+                      <div className='grid w-full max-w-sm items-center'>
+                        <FormItem>
+                          <FormLabel>Files</FormLabel>
+                          <FormControl>
+                            <Input
+                              ref={inputRef}
+                              // accept=".jpg, .jpeg, .png, .svg, .gif, .mp4"
+                              type='file'
+                              multiple
+                              onChange={(e) => {
+                                field.onChange(
+                                  e.target.files ? e.target.files : null
+                                );
+                                // form.clearErrors("files")
+                              }}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            **Maximum Files Upload 5 files
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      </div>
+                    )}
+                  />
+                  <div className='text-sm font-medium leading-none mt-4'>
+                    Uploaded Files
+                  </div>
+                  <p className='text-sm text-muted-foreground'>
+                    Below are the files uploaded
+                  </p>
+                  {medias.length > 0 &&
+                    medias.map((media, id) => (
+                      <div key={id} className='mb-2 mt-2'>
+                        <div className='space-y-1 flex items-center'>
+                          <FileText className='w-5 h-5' />
+                          <a
+                            href={media.file_url}
+                            className='text-sm font-medium leading-none'
+                          >
+                            {media.file_url}
+                          </a>
+
+                          <button
+                            type='submit'
+                            onClick={() => {
+                              fetcher.submit(null, {
+                                method: "DELETE",
+                                action: `/remove-file/${media.id}`,
+                              });
+                            }}
+                          >
+                            <Trash2 className='w-5 h-5' />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  <div className='text-sm font-medium leading-none mt-4 border-t max-w-sm pt-6'>
+                    Pending Uploaded
+                  </div>
+                  <p className='text-sm text-muted-foreground'>
+                    Below are the files pedning upload
+                  </p>
+                  {name.length > 0 &&
+                    name.map((file, id) => (
+                      <div
+                        key={id}
+                        className='space-y-1 flex items-center mt-2'
+                      >
+                        <FileText className='w-5 h-5' />
+                        <div className='space-y-1 flex items-center'>
+                          <p className='text-sm font-medium leading-none'>
+                            {file}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  {form.watch().files ? (
+                    <div>
+                      <Button
+                        className='mt-4'
+                        type='button'
+                        variant='outline'
+                        onClick={() => {
+                          form.reset({
+                            files: null,
+                          });
+                          inputRef.current!.value = null;
+                        }}
+                      >
+                        Remove files
+                      </Button>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+          <div className='mt-4'>
+            <Card className='w-full'>
+              <CardHeader>
+                <CardTitle>Time</CardTitle>
+                <div className='text-sm font-medium leading-none mt-4'>
+                  Created at :
+                  <span className='text-sm text-muted-foreground'>
+                    {createdAt}
+                  </span>
                 </div>
+                <div className='text-sm font-medium leading-none mt-4'>
+                  Updated at :
+                  <span className='text-sm text-muted-foreground'>
+                    {updatedAt}
+                  </span>
+                </div>
+              </CardHeader>
+              <CardContent></CardContent>
+            </Card>
+          </div>
 
-              </div>
-            ))}
-
-          <Button type='submit' className='mt-4'>
-            Submit
-          </Button>
+          {busy ? (
+            <Button disabled>
+              <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+              Please wait
+            </Button>
+          ) : (
+            <Button type='submit' className='mt-4'>
+              Submit
+            </Button>
+          )}
         </form>
       </Form>
     </div>
