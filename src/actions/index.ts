@@ -4,8 +4,13 @@ import Cookies from "universal-cookie";
 const cookies = new Cookies();
 
 export const logoutAction = async() => {
-  await fetch("/api/logout/", {
+
+  await fetch("/api/v1/auth/logout", {
+    method:"DELETE",
     credentials: "same-origin",
+    headers: {
+      "X-CSRFToken": cookies.get("csrftoken"),
+    },
   })
 
   return redirect("/login");

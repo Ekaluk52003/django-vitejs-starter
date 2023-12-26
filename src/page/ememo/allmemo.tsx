@@ -1,11 +1,10 @@
 import {
   useLoaderData,
   Form,
-  useSubmit,
   useSearchParams,
 } from "react-router-dom";
 import { DataTable } from "@/components/data-table";
-import { columns } from "@/components/columns";
+import { EmemoColumns } from "@/components/Ememocol"
 import {
   Select,
   SelectContent,
@@ -14,11 +13,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function Pagination() {
+
+export default function Allmemo() {
   // @ts-expect-error ignore //
 
-  const { notes, page, term, perpage } = useLoaderData();
-  const submit = useSubmit();
+  const { ememos, page, term, perpage } = useLoaderData();
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   return (
@@ -39,10 +39,10 @@ export default function Pagination() {
         Example of Pagination
       </h2>
       <DataTable
-        columns={columns}
-        data={notes.results}
-        has_previous={notes.has_previous}
-        has_next={notes.has_next}
+        columns={EmemoColumns}
+        data={ememos.results}
+        has_previous={ememos.has_previous}
+        has_next={ememos.has_next}
         page={page}
         perpage={perpage}
         term={term}

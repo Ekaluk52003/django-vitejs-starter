@@ -3,6 +3,9 @@ from django.conf import settings
 from ninja.security import django_auth
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth.tokens import default_token_generator
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.http import HttpResponse
+
 
 from django.contrib.auth.forms import (
     PasswordResetForm,
@@ -36,6 +39,9 @@ _LOGIN_BACKEND = 'django.contrib.auth.backends.ModelBackend'
     response={200: UserOut, 403: None},
     auth=None
 )
+
+
+
 def login(request, data: LoginIn):
     user = authenticate(backend=_LOGIN_BACKEND, **data.dict())
     if user is not None and user.is_active:
@@ -43,8 +49,14 @@ def login(request, data: LoginIn):
         return user
     return 403, None
 
+@router.post("/csrf", tags=_TGS)
+@ensure_csrf_cookie
+@csrf_exempt
+def get_csrf_token(request):
+    return HttpResponse()
 
-@router.delete('/', tags=_TGS, response={204: None}, auth=django_auth)
+
+@router.delete('/logout', tags=_TGS, response={204: None}, auth=django_auth)
 def logout(request):
     django_logout(request)
     return 204, None

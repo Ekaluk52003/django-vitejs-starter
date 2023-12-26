@@ -9,7 +9,7 @@ from django.contrib import admin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
+    # path('api/', include('api.urls')),
     path("api/v1/", api.urls),
     # path('password_reset/<uidb64>/<token>/', TemplateView.as_view(template_name="base.html"),
     #     name='password_reset_confirm')

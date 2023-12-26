@@ -5,7 +5,7 @@ import "./index.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./layouts/Root";
-import { csrfLoader, authLoader, paginationLoader, userSelectLoader, EmemoLoader, userLoader, redirectLogin } from "./loaders";
+import { csrfLoader, authLoader, paginationLoader, userSelectLoader, EmemoLoader, userLoader, redirectLogin, paginationEmemo } from "./loaders";
 import { logoutAction, loginAction, uploadAction, resetPasswordAction, ForgotPasswordAction,  createEmemoAction, editEmemoAction, removeFileAction } from "./actions/index.ts";
 import Login from "./page/login";
 import ProtectPage from "./page/ProtectPage";
@@ -16,6 +16,9 @@ import Pagination from "./page/Pagination.tsx";
 import Dashboard from "./page/Dashboard.tsx";
 import Submit from "./page/ememo/submit.tsx";
 import Detail from "./page/ememo/detail.tsx";
+import Errorpage from "./components/error-page.tsx";
+import Allmemo from "./page/ememo/allmemo.tsx";
+
 
 
 
@@ -24,8 +27,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <Root />,
     loader: csrfLoader,
-    action: logoutAction,
-
+    id: "authloader",
     children: [
       {
         path: "/login",
@@ -64,7 +66,13 @@ const router = createBrowserRouter([
         path: "dashboard",
         element: <Dashboard />,
         loader:authLoader,
+
         children:[
+          {
+            path: "/dashboard/ememo/all",
+            element: <Allmemo />,
+            loader:paginationEmemo
+          },
           {
             path: "/dashboard/ememo/new",
             element: <Submit />,
@@ -75,8 +83,10 @@ const router = createBrowserRouter([
             path: "/dashboard/ememo/:ememo_id",
             element: <Detail />,
             action: editEmemoAction,
-            loader:EmemoLoader
-          },
+            loader:EmemoLoader,
+            errorElement:<Errorpage/>
+
+          }
 
         ]
 
@@ -95,6 +105,8 @@ const router = createBrowserRouter([
   path: "/remove-file/:ememo_id",
   action: removeFileAction,
 }
+
+
 
 ]);
 

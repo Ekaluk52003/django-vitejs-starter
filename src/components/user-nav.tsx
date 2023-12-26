@@ -11,22 +11,15 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useFetcher, Form } from "react-router-dom";
+import { useFetcher, Form, useRouteLoaderData } from "react-router-dom";
 
 import { IMAGES } from "@/images/Images";
 
 export function UserNav() {
 
-  const fetcher = useFetcher();
-  const  { data } = fetcher
+  const AuthUser = useRouteLoaderData("authloader");
 
-  React.useEffect(() => {
-    fetcher.load('/load-user');
-  }, []);
-
-
-  const session  = data
-  if (session) {
+  if (AuthUser) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -43,11 +36,11 @@ export function UserNav() {
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">
-                {data.fullname}
+                {AuthUser.fullname}
 
               </p>
               <p className="text-xs leading-none text-muted-foreground">
-              {data.email}
+              {AuthUser.email}
               </p>
             </div>
           </DropdownMenuLabel>
@@ -61,7 +54,7 @@ export function UserNav() {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem >
-          <Form method='post' action="/logout">
+          <Form method='DELETE' action="/logout">
                 <button type='submit'>logout</button>
               </Form>
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

@@ -16,6 +16,12 @@ export const navItems: NavItem[] = [
     label: "Dashboard",
   },
   {
+    title: "All Memo",
+    href: "/dashboard/ememo/all",
+    icon: "page",
+    label: "New memo",
+  },
+  {
     title: "New Memo",
     href: "/dashboard/ememo/new",
     icon: "page",

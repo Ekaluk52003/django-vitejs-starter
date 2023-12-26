@@ -22,6 +22,8 @@ interface DataTableProps<TData, TValue> {
   has_next: boolean;
   has_previous: boolean;
   page: number;
+  perpage: number;
+  term:string
 }
 
 export function DataTable<TData, TValue>({
@@ -30,6 +32,8 @@ export function DataTable<TData, TValue>({
   has_next,
   has_previous,
   page,
+  perpage,
+  term
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -92,12 +96,12 @@ export function DataTable<TData, TValue>({
       <div className='flex items-center justify-end space-x-2 py-4'>
         {has_previous && (
           <Button variant='outline' size='sm'>
-            <Link to={`?page=${page - 1}`}>Previous</Link>
+            <Link to={`?page=${page - 1}${term?`&term=${term}`:""}${perpage?`&perpage=${perpage}`:""}`}>Previous</Link>
           </Button>
         )}
         {has_next && (
           <Button variant='outline' size='sm'>
-            <Link to={`?page=${page + 1}`}>Next</Link>
+            <Link to={`?page=${page + 1}${term?`&term=${term}`:"" }${perpage?`&perpage=${perpage}`:""}`}>Next</Link>
           </Button>
         )}
       </div>

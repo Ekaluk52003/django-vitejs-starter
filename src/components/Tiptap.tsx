@@ -156,10 +156,10 @@ const MenuBar = ({ editor }) => {
         >
           <span>Black</span>
         </button>
-        <button onClick={() => editor.chain().focus().undo().run()}>
+        <button type="button" onClick={() => editor.chain().focus().undo().run()}>
           <Undo2 className='w-4 h-4' />
         </button>
-        <button onClick={() => editor.chain().focus().redo().run()}>
+        <button type="button" onClick={() => editor.chain().focus().redo().run()}>
           <Redo2 className='w-4 h-4' />
         </button>
       </div>

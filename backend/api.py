@@ -17,8 +17,11 @@ from typing import List, Any
 import math
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 api = NinjaAPI(csrf=True)
+
+
 
 api.add_router('/auth/', auth_router)
 api.add_router('/ememo/', ememo_router, tags=["Ememo Routes"])
@@ -55,9 +58,10 @@ class UserLabel(Schema):
      value: str = None
 
 @api.get("/paginate-notes",response=PaginatedNote)
-def list_notes(request,page:int=1):
-    notes = Note.objects.all()
-    paginator = Paginator(notes,2)
+def list_notes(request, perpage:int=2, term='', page:int=1):
+    print('q', term)
+    notes = Note.objects.filter(Q(content__icontains=term)| Q(title__icontains=term))
+    paginator = Paginator(notes,perpage)
     page_number = page
     page_object = paginator.get_page(page_number)
     response = {}

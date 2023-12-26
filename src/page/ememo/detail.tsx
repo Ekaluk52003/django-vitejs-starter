@@ -37,6 +37,7 @@ import {
   useSubmit,
   useFetcher,
   useNavigation,
+  useRouteLoaderData
 } from "react-router-dom";
 import { Trash2, FileText } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -79,11 +80,17 @@ export default function Detail() {
   const fetcher = useFetcher();
   const submit = useSubmit();
   const { toast } = useToast();
+
   const navigation = useNavigation();
   const busy = navigation.state === "submitting";
   const users = data.user;
   const ememo = data.ememo;
   const medias = data.medias;
+  const AuthUser = useRouteLoaderData("authloader");
+
+  const Authorize = AuthUser.fullname ==  ememo.assignnee.fullname
+
+
 
   const defaultValues: Partial<EmemoFormValues> = {
     title: ememo.title,
@@ -501,6 +508,9 @@ export default function Detail() {
           )}
         </form>
       </Form>
+
+      {Authorize &&    <Button className="mt-2"> Approve</Button>}
+
     </div>
   );
 }
