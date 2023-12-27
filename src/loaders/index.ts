@@ -87,8 +87,8 @@ export const paginationLoader = async ({request}) => {
     const pageNumber = url.searchParams.get("page") || 1
     const term = url.searchParams.get("term") || ""
     const perpage = url.searchParams.get("perpage") || 3
-
-      const response = await fetch(`/api/v1/ememo/pagination/allememo?page=${pageNumber}&term=${term}&perpage=${perpage}`, {
+    const me = url.searchParams.get("me") || ""
+      const response = await fetch(`/api/v1/ememo/pagination/allememo?page=${pageNumber}&term=${term}&perpage=${perpage}&me=${me}`, {
         credentials: "same-origin",
       });
 

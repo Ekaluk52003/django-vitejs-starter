@@ -257,24 +257,51 @@ def create_media(request, ememo_id: int, file: UploadedFile):
 
 
 @router.get("/pagination/allememo", auth=django_auth, response=PaginatedEmemo)
-def allmemo(request, perpage: int = 2, term='', page: int = 1):
-    manager = request.user.groups.filter(name="Manager").exists()
-    if manager:
-        ememos = Ememo.objects.filter(Q(content__icontains="try once more") | Q(
-            title__icontains=term)).order_by('-created_at')
-    else:
-        ememos = Ememo.objects.filter(Q(content__icontains=term) | Q(title__icontains=term), Q(assignnee_id=request.auth.id) | Q(
-            reviewer_id=request.auth.id) | Q(approver_id=request.auth.id) | Q(author_id=request.auth.id)).order_by('-created_at')
+def allmemo(request, perpage: int = 2, term='', me="me", page: int = 1):
 
-    paginator = Paginator(ememos, perpage)
-    page_number = page
-    page_object = paginator.get_page(page_number)
-    response = {}
-    response["total_ememos"] = page_object.paginator.count
-    response["total_pages"] = page_object.paginator.num_pages
-    response["per_page"] = page_object.paginator.per_page
-    response["has_next"] = page_object.has_next()
-    response["has_previous"] = page_object.has_previous()
-    response["results"] = [
-        i for i in page_object.object_list.select_related('author', 'assignnee')]
-    return response
+       if me:
+          print('true me')
+          ememos = Ememo.objects.filter(assignnee_id=request.auth.id).exclude(step="DONE").order_by('-created_at')
+          paginator = Paginator(ememos, perpage)
+          page_number = page
+          page_object = paginator.get_page(page_number)
+          response = {}
+          response["total_ememos"] = page_object.paginator.count
+          response["total_pages"] = page_object.paginator.num_pages
+          response["per_page"] = page_object.paginator.per_page
+          response["has_next"] = page_object.has_next()
+          response["has_previous"] = page_object.has_previous()
+          response["results"] = [ i for i in page_object.object_list.select_related('author', 'assignnee')]
+          return response
+#  manager = request.user.groups.filter(name="Manager").exists()
+       elif request.user.groups.filter(name="Manager").exists() :
+            print('true manager')
+            ememos = Ememo.objects.filter(Q(content__icontains="try once more") | Q(
+            title__icontains=term)).order_by('-created_at')
+            paginator = Paginator(ememos, perpage)
+            page_number = page
+            page_object = paginator.get_page(page_number)
+            response = {}
+            response["total_ememos"] = page_object.paginator.count
+            response["total_pages"] = page_object.paginator.num_pages
+            response["per_page"] = page_object.paginator.per_page
+            response["has_next"] = page_object.has_next()
+            response["has_previous"] = page_object.has_previous()
+            response["results"] = [ i for i in page_object.object_list.select_related('author', 'assignnee')]
+            return response
+
+       else  :
+           print('true else')
+           ememos = Ememo.objects.filter(Q(content__icontains=term) | Q(title__icontains=term), Q(assignnee_id=request.auth.id) | Q(
+           reviewer_id=request.auth.id) | Q(approver_id=request.auth.id) | Q(author_id=request.auth.id)).order_by('-created_at')
+           paginator = Paginator(ememos, perpage)
+           page_number = page
+           page_object = paginator.get_page(page_number)
+           response = {}
+           response["total_ememos"] = page_object.paginator.count
+           response["total_pages"] = page_object.paginator.num_pages
+           response["per_page"] = page_object.paginator.per_page
+           response["has_next"] = page_object.has_next()
+           response["has_previous"] = page_object.has_previous()
+           response["results"] = [  i for i in page_object.object_list.select_related('author', 'assignnee')]
+           return response
