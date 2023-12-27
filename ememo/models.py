@@ -69,5 +69,6 @@ class Log(models.Model):
     comment = models.TextField(verbose_name="Comment", blank=True, null=True)
     ememo =   models.ForeignKey(Ememo, on_delete=models.CASCADE, related_name='log')
     logBy =   models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
       return self.description

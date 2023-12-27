@@ -42,7 +42,8 @@ class Message(Schema):
 
 class UserSchema(Schema):
     id: int
-    fullname: str
+    fullname: str = None
+    jobtitle: str = None
 
 
 class EmemoOut(Schema):
@@ -75,6 +76,13 @@ class Emedia(Schema):
     id: str
 
 
+class LogSchema(Schema):
+    id: int
+    description: str
+    comment: str
+    logBy: UserSchema = None
+    created_at: datetime
+
 class PaginatedEmemo(Schema):
     total_ememos: int
     total_pages: int
@@ -100,24 +108,26 @@ class emomoUpdate(Schema):
 @router.put('/approve/{ememo_id}', auth=django_auth)
 def approve(request, payload: Comment, ememo_id: int):
     ememo = get_object_or_404(Ememo, id=ememo_id)
-    if request.auth != ememo.assignnee:
+    print(request.auth.id != ememo.assignnee_id)
+    if request.auth.id != ememo.assignnee_id:
         return 401, {'message': 'You are not assigned to this'}
     flow = FlowEmemo.objects.get(source=ememo.step)
     ememo.step = flow.target
-    if flow.target == "PRE_APPROVE":
-        log = Log()
-        log.comment = payload.comment or None
-        log.description = f"change status from {flow.source} to {flow.target}"
-        log.logBy = request.auth
-        log.ememo = ememo
-        log.save()
-        ememo.assignnee = ememo.reviewer
+
+    if flow.target == "PRE_APPROVE" :
+         ememo.assignnee = ememo.reviewer
     if flow.target == "FINAL_APPROVE":
         ememo.assignnee = ememo.approver
     if flow.target == "DONE":
         ememo.assignnee = None
-
     ememo.save()
+
+    log = Log()
+    log.comment = payload.comment or None
+    log.description = f"change status from {flow.source} to {flow.target}"
+    log.logBy = request.auth
+    log.ememo = ememo
+    log.save()
     return 200, {'message': 'approve success'}
 
 
@@ -199,9 +209,14 @@ def delete_media(request, media_id: int):
 @router.get("/media/{ememo_id}", auth=django_auth, response=List[Emedia])
 def ememo_media(request, ememo_id: int):
     media = EmemoMedia.objects.filter(ememo__pk=ememo_id)
-    print(media)
+
     return 200, media
 
+@router.get("/log/{ememo_id}", auth=django_auth, response=List[LogSchema])
+def ememo_log(request, ememo_id: int):
+    log= Log.objects.filter(ememo__pk=ememo_id)
+
+    return 200, log
 
 @router.put("/update/{ememo_id}")
 def update_ememo(request, ememo_id: int,  form: EmemoSchema = Form(...), files: List[UploadedFile] = None):

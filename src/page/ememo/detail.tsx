@@ -1,6 +1,7 @@
 import { Tiptap } from "@/components/Tiptap";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
+import Step  from "@/components/step";
 import {
   Popover,
   PopoverContent,
@@ -13,7 +14,7 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
-import { Loader2 } from "lucide-react";
+import { Loader2,  CalendarClock, Contact } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -37,7 +38,8 @@ import {
   useSubmit,
   useFetcher,
   useNavigation,
-  useRouteLoaderData
+  useRouteLoaderData,
+  useRevalidator
 } from "react-router-dom";
 import { Trash2, FileText } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -72,6 +74,16 @@ const formSchema = z.object({
 
   files: z.any(),
 });
+
+const formSchema2 = z.object({
+  comment: z
+    .string()
+    .min(2, {
+      message: "comment must be at least 2 characters.",
+    })
+    .optional(),
+});
+
 type EmemoFormValues = z.infer<typeof formSchema>;
 
 export default function Detail() {
@@ -80,15 +92,17 @@ export default function Detail() {
   const fetcher = useFetcher();
   const submit = useSubmit();
   const { toast } = useToast();
-
+  const revalidator = useRevalidator();
   const navigation = useNavigation();
   const busy = navigation.state === "submitting";
   const users = data.user;
   const ememo = data.ememo;
   const medias = data.medias;
+  const logs = data.logs;
   const AuthUser = useRouteLoaderData("authloader");
 
-  const Authorize = AuthUser.fullname ==  ememo.assignnee.fullname
+  const AssignTo = ememo.assignnee ? ememo.assignnee.fullname : "no user"
+  const Authorize = AuthUser.fullname == AssignTo
 
 
 
@@ -97,8 +111,8 @@ export default function Detail() {
     content: ememo.content,
     approver_id: ememo.approver.id.toString(),
     reviewer_id: ememo.reviewer.id.toString(),
-    author: ememo.reviewer.fullname,
-    assignnee: ememo.assignnee.fullname,
+    author: ememo.author.fullname,
+    assignnee: ememo.assignnee ? ememo.assignnee.fullname : ""
     // files: new File([], "")
   };
 
@@ -108,6 +122,13 @@ export default function Detail() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
+  });
+
+  const form2 = useForm<z.infer<typeof formSchema2>>({
+    resolver: zodResolver(formSchema2),
+    defaultValues: {
+      comment: "",
+    },
   });
 
   const fileNames = form.watch("files", null);
@@ -201,6 +222,12 @@ export default function Detail() {
               {" "}
               <Card className='w-full rounded-sm my-4'>
                 <CardHeader>
+                <CardTitle>Step</CardTitle>
+                <div className='text-sm font-medium leading-none mt-4'>
+
+
+                      <Step step= {ememo.step} />
+                    </div>
                   <CardTitle>User Details</CardTitle>
 
                   <CardContent>
@@ -495,22 +522,84 @@ export default function Detail() {
               <CardContent></CardContent>
             </Card>
           </div>
+          <div className='mt-4'>
+            <Card className='w-full'>
+              <CardHeader>
+                <CardTitle>Logs</CardTitle>
 
-          {busy ? (
-            <Button disabled>
-              <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-              Please wait
-            </Button>
-          ) : (
-            <Button type='submit' className='mt-4'>
-              Submit
-            </Button>
+                {logs.map((log) => (
+                  <div key={log.id}>
+                    <div className='text-sm font-medium leading-none mt-4'>
+                     Details: {log.description}
+                    </div>
+                    <div className='text-sm font-medium leading-none mt-4'>
+                    Comment:  {log.comment}
+                    </div>
+                    <div> <Contact className="inline-flex w-4 mr-2" />{log.logBy.fullname}</div>
+                    <div>{log.logBy.jobtitle}</div>
+                    <div> <CalendarClock className="inline-flex w-4 mr-2" />{dayjs(log.created_at).format("ddd, MMMM D, YYYY, HH:mm a")}</div>
+                  </div>
+                ))}
+              </CardHeader>
+              <CardContent></CardContent>
+            </Card>
+          </div>
+
+          {Authorize && (
+            <>
+              {busy ? (
+                <Button disabled>
+                  <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                  Please wait
+                </Button>
+              ) : (
+                <Button type='submit' className='mt-4'>
+                  Submit
+                </Button>
+              )}
+            </>
           )}
         </form>
       </Form>
 
-      {Authorize &&    <Button className="mt-2"> Approve</Button>}
-
+      {Authorize && (
+        <Form {...form2}>
+          <form
+            onSubmit={form2.handleSubmit((values) => {
+              const data = new FormData();
+              data.append("comment", values.comment);
+              fetcher.submit(data, {
+                method: "PUT",
+                action: `/approve/${ememo.id}`,
+              });
+              toast({
+                title: "Submitted",
+                description: "Your form has been submitted",
+              });
+          
+            })}
+          >
+            <div className='mb-6'>
+              <FormField
+                control={form2.control}
+                name='comment'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder='shadcn' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type='submit' className='mt-4'>
+                Approve
+              </Button>
+            </div>
+          </form>
+        </Form>
+      )}
     </div>
   );
 }

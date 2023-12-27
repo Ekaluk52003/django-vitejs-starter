@@ -124,6 +124,10 @@ export const paginationLoader = async ({request}) => {
         credentials: "same-origin",
       });
 
+      const logs = await fetch(`/api/v1/ememo/log/${params.ememo_id}`, {
+        credentials: "same-origin",
+      });
+
       if( !ememo.ok) {
        const reponse = await ememo.json()
         throw Error(reponse.message)
@@ -135,10 +139,13 @@ export const paginationLoader = async ({request}) => {
 
       const datamedia =  await medias.json()
 
+      const dataLog = await logs.json()
+
     return {
       ememo: dataEmomo,
       user: dataUser,
-      medias:  datamedia
+      medias:  datamedia,
+      logs: dataLog
     }
 
     }

@@ -160,3 +160,29 @@ export const editEmemoAction = async({ request, params}) => {
   return { success :true}
 
 }
+
+
+
+export const approveAction = async({ request, params}) => {
+
+  const formData = await request.formData();
+  const approveForm = Object.fromEntries(formData);
+
+  const reponse = await fetch(`/api/v1/ememo/approve/${params.ememo_id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": cookies.get("csrftoken"),
+      },
+      credentials: "same-origin",
+      body: JSON.stringify(approveForm),
+    });
+  if(!reponse.ok) {
+
+    return { error :"something wrong"}
+  }
+
+
+  return null
+
+}
