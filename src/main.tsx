@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./layouts/Root";
 import { csrfLoader, authLoader, paginationLoader, userSelectLoader, EmemoLoader, userLoader, redirectLogin, paginationEmemo } from "./loaders";
-import { logoutAction, loginAction, uploadAction, resetPasswordAction, ForgotPasswordAction,  createEmemoAction, editEmemoAction, removeFileAction, approveAction } from "./actions/index.ts";
+import { logoutAction, loginAction, uploadAction, resetPasswordAction, ForgotPasswordAction,  createEmemoAction, editEmemoAction, removeFileAction, approveAction, rejectAction } from "./actions/index.ts";
 import Login from "./page/login";
 import ProtectPage from "./page/ProtectPage";
 import ForgotPassword from "./page/ForgotPassword.tsx";
@@ -108,8 +108,11 @@ const router = createBrowserRouter([
 {
   path: "/approve/:ememo_id",
   action: approveAction,
+},
+{
+  path: "/reject/:ememo_id",
+  action: rejectAction,
 }
-
 
 
 ]);

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin import SimpleListFilter
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import CustomUser
+from .models import CustomUser, Runnumber
 from django.contrib.auth.models import Group
 
 class GroupListFilter(SimpleListFilter):
@@ -53,3 +53,7 @@ class CustomUserAdmin(UserAdmin):
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
+
+class RunnumberAdmin(admin.ModelAdmin):
+    list_display = ("form_name", "running_number")
+admin.site.register(Runnumber,  RunnumberAdmin)

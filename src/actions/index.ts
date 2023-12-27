@@ -139,7 +139,7 @@ export const createEmemoAction = async({ request}) => {
  const data = await reponse.json()
  console.log(data)
 
-return redirect(`/dashboard/ememo/${data.id}`)
+return redirect(`/dashboard/ememo/${data.number}`)
 }
 
 export const editEmemoAction = async({ request, params}) => {
@@ -166,7 +166,15 @@ export const editEmemoAction = async({ request, params}) => {
 export const approveAction = async({ request, params}) => {
 
   const formData = await request.formData();
+
+
+  if(!formData.get('comment')){
+    formData.append('comment',"N/A")
+  }
   const approveForm = Object.fromEntries(formData);
+// you must convert formdata(aray for request bofy form API) unless api require form data
+
+
 
   const reponse = await fetch(`/api/v1/ememo/approve/${params.ememo_id}`, {
       method: "PUT",
@@ -175,7 +183,39 @@ export const approveAction = async({ request, params}) => {
         "X-CSRFToken": cookies.get("csrftoken"),
       },
       credentials: "same-origin",
-      body: JSON.stringify(approveForm),
+      body: JSON.stringify(approveForm ),
+    });
+  if(!reponse.ok) {
+
+    return { error :"something wrong"}
+  }
+
+
+  return null
+
+}
+
+export const rejectAction = async({ request, params}) => {
+
+  const formData = await request.formData();
+
+
+  if(!formData.get('comment')){
+    formData.append('comment',"N/A")
+  }
+  const approveForm = Object.fromEntries(formData);
+// you must convert formdata(aray for request bofy form API) unless api require form data
+
+
+
+  const reponse = await fetch(`/api/v1/ememo/reject/${params.ememo_id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": cookies.get("csrftoken"),
+      },
+      credentials: "same-origin",
+      body: JSON.stringify(approveForm ),
     });
   if(!reponse.ok) {
 

@@ -1,4 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
+import Placeholder from '@tiptap/extension-placeholder'
 import { Color } from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import StarterKit from "@tiptap/starter-kit";
@@ -176,6 +177,10 @@ export const Tiptap = ({ content, onChange }:{
       TextStyle,
       Color,
       Underline,
+      Placeholder.configure({
+        emptyEditorClass: 'is-editor-empty',
+        placeholder: 'Write content …',
+      }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),

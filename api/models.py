@@ -22,3 +22,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+class Runnumber(models.Model):
+    form_name = models.CharField(verbose_name="Form Name", max_length=255 , null=True, blank=True)
+    running_number =  models.IntegerField(verbose_name="Running Number", null=True, blank=True)
+    def __str__(self):
+        return self.form_name

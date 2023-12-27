@@ -29,7 +29,7 @@ from .schema import (
 )
 
 router = Router()
-_TGS = ['Django Ninja Mill Auth']
+_TGS = ['Authentication']
 _LOGIN_BACKEND = 'django.contrib.auth.backends.ModelBackend'
 
 

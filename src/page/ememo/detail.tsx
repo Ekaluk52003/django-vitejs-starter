@@ -2,6 +2,7 @@ import { Tiptap } from "@/components/Tiptap";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
 import Step from "@/components/step";
+import { useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -14,6 +15,17 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 import { Loader2, CalendarClock, Contact } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,9 +51,8 @@ import {
   useFetcher,
   useNavigation,
   useRouteLoaderData,
-  useRevalidator,
 } from "react-router-dom";
-import { Trash2, FileText } from "lucide-react";
+import { Trash2, FileText,ArrowBigRightDash, ArrowBigLeftDash  } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const MAX_FILE_SIZE = 100000;
@@ -65,21 +76,15 @@ const formSchema = z.object({
   approver_id: z.string({
     required_error: "Please select a approver.",
   }),
-  author: z.string({
-    required_error: "Please select a reviewer.",
-  }),
-  assignnee: z.string({
-    required_error: "Please select a reviewer.",
-  }),
 
   files: z.any(),
 });
 
-
-
 type EmemoFormValues = z.infer<typeof formSchema>;
 
 export default function Detail() {
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
   const inputRef = useRef(null);
   const data = useLoaderData();
   const fetcher = useFetcher();
@@ -95,8 +100,8 @@ export default function Detail() {
   const AuthUser = useRouteLoaderData("authloader");
 
   const AssignTo = ememo.assignnee ? ememo.assignnee.fullname : "No Assignee";
-  const Authorize = AuthUser.fullname == AssignTo;
-
+  const Authorize = AuthUser.fullname == AssignTo
+  const AuthorizeToreject = AuthUser.fullname == AssignTo ||  AuthUser.fullname == ememo.author.fullname
   const defaultValues: Partial<EmemoFormValues> = {
     title: ememo.title,
     content: ememo.content,
@@ -170,6 +175,7 @@ export default function Detail() {
 
   return (
     <div>
+      <h2 className='text-3xl font-bold tracking-tight'>Ememo {ememo.number}👋</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className='mb-6'>
@@ -207,15 +213,12 @@ export default function Detail() {
                 <CardHeader>
                   <CardTitle>Step</CardTitle>
                   <div>Created by author: {ememo.author.fullname}</div>
-
                   Assign to : {AssignTo}
                   <div className='text-sm font-medium leading-none mt-4'>
                     <Step step={ememo.step} />
                   </div>
                   <CardTitle>User Details</CardTitle>
-
                   <CardContent>
-
                     <FormField
                       control={form.control}
                       name='reviewer_id'
@@ -487,7 +490,7 @@ export default function Detail() {
                       Details: {log.description}
                     </div>
                     <div className='text-sm font-medium leading-none mt-4'>
-                      Comment: {log.comment}
+                      Comment: {log.comment || "-"}
                     </div>
                     <div>
                       {" "}
@@ -509,7 +512,9 @@ export default function Detail() {
             </Card>
           </div>
 
-          {Authorize && (
+          <div className="flex justify-between mt-2">
+
+          {ememo.step == "Drafted" && ememo.assignnee.fullname ==  AuthUser.fullname && (
             <>
               {busy ? (
                 <Button disabled>
@@ -517,23 +522,83 @@ export default function Detail() {
                   Please wait
                 </Button>
               ) : (
-                <Button type='submit' className='mt-4'>
-                  Submit
+                <Button type='submit'>
+                  Save Edit
                 </Button>
               )}
             </>
           )}
+             {AuthorizeToreject && ememo.step != "Drafted" && (
+        <AlertDialog open={open2} onOpenChange={setOpen2}>
+          <AlertDialogTrigger  className="secondary"> <ArrowBigLeftDash  className="self-baseline inline-flex text-red-500"/><span className="text-red-500">Reject</span></AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure to reject?</AlertDialogTitle>
+              <fetcher.Form method='put' action={`/reject/${ememo.id}`}>
+                <Input
+                  placeholder='for your comment'
+                  name='comment'
+                  id='comment'
+                />
+                <Button
+                  type='submit'
+                  className='mt-4 w-full'
+                  onClick={() => {
+                    setOpen2(false);
+                  }}
+                >
+                  Reject
+                </Button>
+              </fetcher.Form>
+              <AlertDialogDescription>
+                This action cannot be recall
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+       {Authorize && (
+        <AlertDialog open={open} onOpenChange={setOpen}>
+          <AlertDialogTrigger  className="secondary"> <ArrowBigRightDash className="self-baseline inline-flex"/>Process Next</AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure to approve?</AlertDialogTitle>
+              <fetcher.Form method='put' action={`/approve/${ememo.id}`}>
+                <Input
+                  placeholder='for your comment'
+                  name='comment'
+                  id='comment'
+                />
+                <Button
+                  type='submit'
+                  className='mt-4 w-full'
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                >
+                  Approve
+                </Button>
+              </fetcher.Form>
+              <AlertDialogDescription>
+                This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+          </div>
+
         </form>
       </Form>
 
-      {Authorize && (
-        <fetcher.Form method='put' action={`/approve/${ememo.id}`}>
-          <Input placeholder='for your comment' name='comment' />
-          <Button type='submit' className='mt-4'>
-            Approve
-          </Button>
-        </fetcher.Form>
-      )}
+
     </div>
   );
 }

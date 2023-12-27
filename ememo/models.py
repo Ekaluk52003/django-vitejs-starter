@@ -5,12 +5,6 @@ from api.models import CustomUser
 
 
 
-ActionType = (
-          ("Approve", "Approve"),
-          ("Reject", "Reject"),
-           ("Save", "Save"),
-)
-
 Step = (
           ("Drafted", "Drafted"),
           ("PRE_APPROVE", "PRE_APPROVE"),
@@ -21,18 +15,17 @@ Step = (
 class Ememo(models.Model):
     title = models.CharField(verbose_name="Title", max_length=255)
     content = models.TextField(verbose_name="Content")
+    number = models.IntegerField(verbose_name="Number")
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     reviewer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reviewer', null=True, blank=True)
     approver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='approver', null=True, blank=True)
     assignnee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='assignnee', null=True, blank=True)
-    # file = models.FileField(upload_to='files/', blank=True, null=True, validators=[validate_file_size])
-    action = models.TextField(choices=ActionType, blank=True, null=True, default='Save')
     step =  models.CharField(max_length=13, choices=Step, default='Drafted')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-      return str(self.pk) + '-' + self.title + '-' + self.content
+      return str(self.pk) + '-' + self.title
 
 class EmemoMedia(models.Model):
     ememo = models.ForeignKey(
@@ -40,7 +33,7 @@ class EmemoMedia(models.Model):
         on_delete=models.CASCADE,
         related_name="media",
     )
-    file_url = models.ImageField(upload_to='files/ememo/')
+    file_url =  models.FileField(upload_to='files/ememo/', blank=True, null=True, validators=[validate_file_size])
 
     created_at = models.DateTimeField(
         auto_now_add=True,

@@ -14,9 +14,14 @@ export type Ememo = {
 import dayjs from "dayjs";
 export const EmemoColumns: ColumnDef<Ememo>[] = [
   {
+    accessorKey: "number",
+    header: "Number",
+    // cell: (props) => (<Link to={`/dashboard/ememo/${props.row.original.id}`}><Iconlink className="w-4 inline-flex mr-1"/>{props.getValue()}</Link>)
+    cell: (props) => (<Link to={`/dashboard/ememo/${props.getValue()}`}><Iconlink className="w-4 inline-flex mr-1"/>{props.getValue()}</Link>)
+  },
+  {
     accessorKey: "title",
     header: "Title",
-    cell: (props) => (<Link to={`/dashboard/ememo/${props.row.original.id}`}><Iconlink className="w-4 inline-flex mr-1"/>{props.getValue()}</Link>)
   },
   {
     accessorKey: "step",
@@ -29,7 +34,7 @@ export const EmemoColumns: ColumnDef<Ememo>[] = [
   {
     accessorKey: "assignnee.fullname",
     header: "Assignnee",
-    cell: (props) => <span>{(props.getValue())}</span>
+    cell: (props) => <span>{ props.row.original.assignnee ? props.getValue() : "closed"}</span>
   },
 
   {

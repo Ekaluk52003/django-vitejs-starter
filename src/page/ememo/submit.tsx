@@ -74,7 +74,7 @@ export default function Submit() {
   const inputRef = useRef(null);
   const data = useLoaderData();
   const submit = useSubmit();
-  
+
   const users = data;
 
   const defaultValues: Partial<EmemoFormValues> = {
@@ -143,7 +143,7 @@ Hi, Welcome back 👋
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder='shadcn' {...field} />
+                <Input placeholder='title' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -156,7 +156,7 @@ Hi, Welcome back 👋
             <FormItem>
               <FormLabel>Content</FormLabel>
               <FormControl>
-                <Tiptap content={field.name} onChange={field.onChange} />
+                <Tiptap content={''} onChange={field.onChange} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -8,27 +8,21 @@ from typing import List
 from ninja import NinjaAPI, ModelSchema, Schema, UploadedFile, Form, File
 from .models import Ememo, FlowEmemo, Log, EmemoMedia
 from ninja.security import django_auth
-from api.models import CustomUser
+from api.models import CustomUser, Runnumber
 from datetime import datetime
 from django.db.models import Q
 from django.core.paginator import Paginator
 
 
-class EmemoSchema(ModelSchema):
-    class Config:
-        model = Ememo
-        model_fields = "__all__"
-        # model_exclude = ['assignnee','file','author', 'id', 'created_at', 'updated_at']
-        model_exclude = ['assignnee', 'author',
-                         'id', 'created_at', 'updated_at']
+# class EmemoSchema(ModelSchema):
+#     class Config:
+#         model = Ememo
+#         model_fields = "__all__"
+#         # model_exclude = ['assignnee','file','author', 'id', 'created_at', 'updated_at']
+#         model_exclude = ['assignnee', 'author',
+#                          'number' 'created_at', 'updated_at']
 
 
-class EmemoSchemaIn(Schema):
-
-    title: str
-    content: str
-    reviewer_id:  str = None
-    approver_id:   str = None
 
 
 class EmemoIn(Schema):
@@ -45,16 +39,23 @@ class UserSchema(Schema):
     fullname: str = None
     jobtitle: str = None
 
+class EmemoSchemaIn(Schema):
+
+    title: str
+    content: str
+    reviewer_id:  str = None
+    approver_id:   str = None
+    # reviewer:  UserSchema = None
 
 class EmemoOut(Schema):
     id: int
+    number: int = None
     title: str
     content: str
     author:  UserSchema = None
     reviewer:  UserSchema = None
     approver:  UserSchema = None
     assignnee:  UserSchema = None
-    action: str
     step: str
     created_at: datetime
     updated_at: datetime
@@ -63,6 +64,7 @@ class EmemoOut(Schema):
 class EmemoOutPaginate(Schema):
     id: int
     title: str
+    number: int
     content: str
     step: str
     author:  UserSchema = None
@@ -108,7 +110,7 @@ class emomoUpdate(Schema):
 @router.put('/approve/{ememo_id}', auth=django_auth)
 def approve(request, payload: Comment, ememo_id: int):
     ememo = get_object_or_404(Ememo, id=ememo_id)
-    print(request.auth.id != ememo.assignnee_id)
+
     if request.auth.id != ememo.assignnee_id:
         return 401, {'message': 'You are not assigned to this'}
     flow = FlowEmemo.objects.get(source=ememo.step)
@@ -124,7 +126,7 @@ def approve(request, payload: Comment, ememo_id: int):
 
     log = Log()
     log.comment = payload.comment or None
-    log.description = f"change status from {flow.source} to {flow.target}"
+    log.description = f"change status from {flow.source} to {flow.target} ✔️"
     log.logBy = request.auth
     log.ememo = ememo
     log.save()
@@ -133,9 +135,11 @@ def approve(request, payload: Comment, ememo_id: int):
 
 @router.put('/reject/{ememo_id}', auth=django_auth,  response={200: Message, 401: Message})
 def reject(request, payload: Comment, ememo_id: int):
+
     ememo = get_object_or_404(Ememo, id=ememo_id)
-    if request.auth != ememo.assignnee:
-        return 401, {'message': 'You are not assigned to this'}
+
+    if request.auth.id != ememo.assignnee_id and request.auth.id != ememo.author_id:
+        return 401, {'message': 'You are not authorize'}
     flow = FlowEmemo.objects.get(source=ememo.step)
     if flow.can_reject == False:
         return 401, {'message': 'You cannot reject'}
@@ -143,8 +147,8 @@ def reject(request, payload: Comment, ememo_id: int):
     ememo.step = "Drafted"
     ememo.save()
     log = Log()
-    log.comment = payload.comment or None
-    log.description = "Your request is rejected"
+    log.comment = payload.comment
+    log.description = "Your request is rejected ❌"
     log.logBy = request.auth
     log.ememo = ememo
     log.save()
@@ -174,24 +178,33 @@ def revert(request, payload: Comment, ememo_id: int):
 @router.post("/create", auth=django_auth)
 def create_ememo(request, data: EmemoSchemaIn = Form(...), files: List[UploadedFile] = None):
 
-    ememo_created = Ememo.objects.create(title=data.title, content=data.content,  reviewer_id=data.reviewer_id,
+    run_number = Runnumber.objects.filter(form_name="ememo").get()
+    ememo_created = Ememo.objects.create(title=data.title, content=data.content,  reviewer_id=data.reviewer_id, number=run_number.running_number,
                                          approver_id=data.approver_id, assignnee_id=request.auth.id, author_id=request.auth.id)
+
+    run_number.running_number =  run_number.running_number  + 1
+    run_number.save()
 
     if files is not None:
         for file in files:
             EmemoMedia.objects.create(ememo=ememo_created, file_url=file)
 
-    return {"id":  ememo_created.pk}
+    return {"number":  ememo_created.number}
 
 
 @router.get("/{ememo_id}", auth=django_auth, response={200: EmemoOut, 401: Message, 404: Message})
 def getEmemo(request, ememo_id: int):
     try:
         ememo = Ememo.objects.select_related(
-            'author', 'reviewer', 'approver', 'assignnee').get(id=ememo_id)
+            'author', 'reviewer', 'approver', 'assignnee').get(number=ememo_id)
+
     except Ememo.DoesNotExist as e:
         return 404, {'message': 'Could not find ememo'}
-    if request.auth != ememo.assignnee and request.auth != ememo.author and request.auth != ememo.reviewer and request.auth != ememo.approver:
+
+    if request.user.groups.filter(name="Manager").exists():
+         return 200, ememo
+
+    if request.auth != ememo.assignnee and request.auth != ememo.author and request.auth != ememo.reviewer and request.auth != ememo.approver :
         return 401, {'message': 'Unauthorized'}
     return 200, ememo
 
@@ -208,30 +221,32 @@ def delete_media(request, media_id: int):
 
 @router.get("/media/{ememo_id}", auth=django_auth, response=List[Emedia])
 def ememo_media(request, ememo_id: int):
-    media = EmemoMedia.objects.filter(ememo__pk=ememo_id)
+    media = EmemoMedia.objects.filter(ememo__number=ememo_id)
 
     return 200, media
 
 @router.get("/log/{ememo_id}", auth=django_auth, response=List[LogSchema])
 def ememo_log(request, ememo_id: int):
-    log= Log.objects.filter(ememo__pk=ememo_id).order_by('-created_at')
+    log= Log.objects.filter(ememo__number=ememo_id).order_by('-created_at')
 
     return 200, log
 
 @router.put("/update/{ememo_id}")
-def update_ememo(request, ememo_id: int,  form: EmemoSchema = Form(...), files: List[UploadedFile] = None):
-    ememo_update = get_object_or_404(Ememo, id=ememo_id)
+def update_ememo(request, ememo_id: int,  form: EmemoSchemaIn = Form(...), files: List[UploadedFile] = None):
+
+    ememo_update = Ememo.objects.get(number=ememo_id)
+
     ememo_update.title = form.title
     ememo_update.content = form.content
-    ememo_update.reviewer_id = form.reviewer
-    ememo_update.approver_id = form.approver
+    ememo_update.reviewer_id = form.reviewer_id
+    ememo_update.approver_id = form.approver_id
 
     if files is not None:
         for file in files:
             EmemoMedia.objects.create(ememo=ememo_update, file_url=file)
 
     ememo_update.save()
-    return {"id": ememo_update.id}
+    return {"number": ememo_update.number}
 
 
 @router.post("/media/new/{ememo_id}", auth=django_auth)
