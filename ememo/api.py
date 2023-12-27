@@ -214,7 +214,7 @@ def ememo_media(request, ememo_id: int):
 
 @router.get("/log/{ememo_id}", auth=django_auth, response=List[LogSchema])
 def ememo_log(request, ememo_id: int):
-    log= Log.objects.filter(ememo__pk=ememo_id)
+    log= Log.objects.filter(ememo__pk=ememo_id).order_by('-created_at')
 
     return 200, log
 

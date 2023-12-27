@@ -1,7 +1,7 @@
 import { Tiptap } from "@/components/Tiptap";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
-import Step  from "@/components/step";
+import Step from "@/components/step";
 import {
   Popover,
   PopoverContent,
@@ -14,7 +14,7 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
-import { Loader2,  CalendarClock, Contact } from "lucide-react";
+import { Loader2, CalendarClock, Contact } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -39,7 +39,7 @@ import {
   useFetcher,
   useNavigation,
   useRouteLoaderData,
-  useRevalidator
+  useRevalidator,
 } from "react-router-dom";
 import { Trash2, FileText } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -75,14 +75,7 @@ const formSchema = z.object({
   files: z.any(),
 });
 
-const formSchema2 = z.object({
-  comment: z
-    .string()
-    .min(2, {
-      message: "comment must be at least 2 characters.",
-    })
-    .optional(),
-});
+
 
 type EmemoFormValues = z.infer<typeof formSchema>;
 
@@ -92,7 +85,7 @@ export default function Detail() {
   const fetcher = useFetcher();
   const submit = useSubmit();
   const { toast } = useToast();
-  const revalidator = useRevalidator();
+
   const navigation = useNavigation();
   const busy = navigation.state === "submitting";
   const users = data.user;
@@ -101,18 +94,15 @@ export default function Detail() {
   const logs = data.logs;
   const AuthUser = useRouteLoaderData("authloader");
 
-  const AssignTo = ememo.assignnee ? ememo.assignnee.fullname : "no user"
-  const Authorize = AuthUser.fullname == AssignTo
-
-
+  const AssignTo = ememo.assignnee ? ememo.assignnee.fullname : "No Assignee";
+  const Authorize = AuthUser.fullname == AssignTo;
 
   const defaultValues: Partial<EmemoFormValues> = {
     title: ememo.title,
     content: ememo.content,
     approver_id: ememo.approver.id.toString(),
     reviewer_id: ememo.reviewer.id.toString(),
-    author: ememo.author.fullname,
-    assignnee: ememo.assignnee ? ememo.assignnee.fullname : ""
+
     // files: new File([], "")
   };
 
@@ -122,13 +112,6 @@ export default function Detail() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
-  });
-
-  const form2 = useForm<z.infer<typeof formSchema2>>({
-    resolver: zodResolver(formSchema2),
-    defaultValues: {
-      comment: "",
-    },
   });
 
   const fileNames = form.watch("files", null);
@@ -222,45 +205,16 @@ export default function Detail() {
               {" "}
               <Card className='w-full rounded-sm my-4'>
                 <CardHeader>
-                <CardTitle>Step</CardTitle>
-                <div className='text-sm font-medium leading-none mt-4'>
+                  <CardTitle>Step</CardTitle>
+                  <div>Created by author: {ememo.author.fullname}</div>
 
-
-                      <Step step= {ememo.step} />
-                    </div>
+                  Assign to : {AssignTo}
+                  <div className='text-sm font-medium leading-none mt-4'>
+                    <Step step={ememo.step} />
+                  </div>
                   <CardTitle>User Details</CardTitle>
 
                   <CardContent>
-                    <FormField
-                      control={form.control}
-                      name='author'
-                      render={({ field }) => (
-                        <div className='w-[200px] p-0'>
-                          <FormItem>
-                            <FormLabel>Submited By</FormLabel>
-                            <FormControl>
-                              <Input placeholder='shadcn' {...field} disabled />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        </div>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name='assignnee'
-                      render={({ field }) => (
-                        <div className='w-[200px] p-0'>
-                          <FormItem>
-                            <FormLabel>Assignnee</FormLabel>
-                            <FormControl>
-                              <Input placeholder='shadcn' {...field} disabled />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        </div>
-                      )}
-                    />
 
                     <FormField
                       control={form.control}
@@ -530,14 +484,24 @@ export default function Detail() {
                 {logs.map((log) => (
                   <div key={log.id}>
                     <div className='text-sm font-medium leading-none mt-4'>
-                     Details: {log.description}
+                      Details: {log.description}
                     </div>
                     <div className='text-sm font-medium leading-none mt-4'>
-                    Comment:  {log.comment}
+                      Comment: {log.comment}
                     </div>
-                    <div> <Contact className="inline-flex w-4 mr-2" />{log.logBy.fullname}</div>
+                    <div>
+                      {" "}
+                      <Contact className='inline-flex w-4 mr-2' />
+                      {log.logBy.fullname}
+                    </div>
                     <div>{log.logBy.jobtitle}</div>
-                    <div> <CalendarClock className="inline-flex w-4 mr-2" />{dayjs(log.created_at).format("ddd, MMMM D, YYYY, HH:mm a")}</div>
+                    <div>
+                      {" "}
+                      <CalendarClock className='inline-flex w-4 mr-2' />
+                      {dayjs(log.created_at).format(
+                        "ddd, MMMM D, YYYY, HH:mm a"
+                      )}
+                    </div>
                   </div>
                 ))}
               </CardHeader>
@@ -563,42 +527,12 @@ export default function Detail() {
       </Form>
 
       {Authorize && (
-        <Form {...form2}>
-          <form
-            onSubmit={form2.handleSubmit((values) => {
-              const data = new FormData();
-              data.append("comment", values.comment);
-              fetcher.submit(data, {
-                method: "PUT",
-                action: `/approve/${ememo.id}`,
-              });
-              toast({
-                title: "Submitted",
-                description: "Your form has been submitted",
-              });
-          
-            })}
-          >
-            <div className='mb-6'>
-              <FormField
-                control={form2.control}
-                name='comment'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                      <Input placeholder='shadcn' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type='submit' className='mt-4'>
-                Approve
-              </Button>
-            </div>
-          </form>
-        </Form>
+        <fetcher.Form method='put' action={`/approve/${ememo.id}`}>
+          <Input placeholder='for your comment' name='comment' />
+          <Button type='submit' className='mt-4'>
+            Approve
+          </Button>
+        </fetcher.Form>
       )}
     </div>
   );
