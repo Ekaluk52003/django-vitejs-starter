@@ -80,7 +80,7 @@ export const paginationLoader = async ({request}) => {
   return { notes:data, page:parseInt(pageNumber as string), term:term, perpage:perpage}
 
   }
-
+// @ts-expect-error ok //
   export const paginationEmemo = async ({request}) => {
 
     const url = new URL(request.url);
@@ -110,7 +110,8 @@ export const paginationLoader = async ({request}) => {
 
     }
 
-    export const EmemoLoader = async ({ request, params }) => {
+    // @ts-expect-error ok //
+    export const EmemoLoader = async ({  params }) => {
 
       const ememo = await fetch(`/api/v1/ememo/${params.ememo_id}`, {
         credentials: "same-origin",

@@ -51,11 +51,17 @@ import {
   useFetcher,
   useNavigation,
   useRouteLoaderData,
+
 } from "react-router-dom";
-import { Trash2, FileText,ArrowBigRightDash, ArrowBigLeftDash  } from "lucide-react";
+import {
+  Trash2,
+  FileText,
+  ArrowBigRightDash,
+  ArrowBigLeftDash,
+} from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
-const MAX_FILE_SIZE = 100000;
+const MAX_FILE_SIZE = 2621440;
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
@@ -83,6 +89,7 @@ const formSchema = z.object({
 type EmemoFormValues = z.infer<typeof formSchema>;
 
 export default function Detail() {
+
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
   const inputRef = useRef(null);
@@ -90,18 +97,24 @@ export default function Detail() {
   const fetcher = useFetcher();
   const submit = useSubmit();
   const { toast } = useToast();
-
   const navigation = useNavigation();
   const busy = navigation.state === "submitting";
+  // @ts-expect-error ignore //
   const users = data.user;
+  // @ts-expect-error ignore //
   const ememo = data.ememo;
+  // @ts-expect-error ignore //
   const medias = data.medias;
+  // @ts-expect-error ignore //
   const logs = data.logs;
   const AuthUser = useRouteLoaderData("authloader");
+console.log("ASDASD", AuthUser)
+  const AssignToUserId = ememo.assignnee ? ememo.assignnee.id : "No Assignee";
+  const AssignToUserFullname = ememo.assignnee ? ememo.assignnee.fullname : "No Assignee";
+  // @ts-expect-error ignore //
+  const Authorize = AuthUser.id ==  AssignToUserId;
+  const CanReject =  Authorize && ememo.step != "Drafted"
 
-  const AssignTo = ememo.assignnee ? ememo.assignnee.fullname : "No Assignee";
-  const Authorize = AuthUser.fullname == AssignTo
-  const AuthorizeToreject = AuthUser.fullname == AssignTo ||  AuthUser.fullname == ememo.author.fullname
   const defaultValues: Partial<EmemoFormValues> = {
     title: ememo.title,
     content: ememo.content,
@@ -126,6 +139,8 @@ export default function Detail() {
       name.push(fileNames[i].name);
     }
   }
+
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const data = new FormData();
@@ -170,12 +185,16 @@ export default function Detail() {
       method: "PUT",
       encType: "multipart/form-data",
     });
+    // @ts-expect-error ignore //
     inputRef.current!.value = null;
   }
-
+  console.log("adasdasdasddsadsdaasdasdasdasdasd")
   return (
     <div>
-      <h2 className='text-3xl font-bold tracking-tight'>Ememo {ememo.number}👋</h2>
+
+      <h2 className='text-3xl font-bold tracking-tight'>
+        Ememo {ememo.number}👋
+      </h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className='mb-6'>
@@ -213,7 +232,7 @@ export default function Detail() {
                 <CardHeader>
                   <CardTitle>Step</CardTitle>
                   <div>Created by author: {ememo.author.fullname}</div>
-                  Assign to : {AssignTo}
+                  Assign to : {AssignToUserFullname}
                   <div className='text-sm font-medium leading-none mt-4'>
                     <Step step={ememo.step} />
                   </div>
@@ -238,6 +257,7 @@ export default function Detail() {
                                 >
                                   {field.value
                                     ? users.find(
+                                        // @ts-expect-error ignore //
                                         (user) => user.value === field.value
                                       )?.label
                                     : "Select User"}
@@ -250,6 +270,7 @@ export default function Detail() {
                                 <CommandInput placeholder='Search language...' />
                                 <CommandEmpty>No User found.</CommandEmpty>
                                 <CommandGroup>
+                                  {/*// @ts-expect-error is ok */}
                                   {users.map((user) => (
                                     <CommandItem
                                       value={user.label}
@@ -301,6 +322,7 @@ export default function Detail() {
                                 >
                                   {field.value
                                     ? users.find(
+                                        // @ts-expect-error is ok
                                         (user) => user.value === field.value
                                       )?.label
                                     : "Select user"}
@@ -313,6 +335,7 @@ export default function Detail() {
                                 <CommandInput placeholder='Search language...' />
                                 <CommandEmpty>No User found.</CommandEmpty>
                                 <CommandGroup>
+                                  {/*// @ts-expect-error is ok */}
                                   {users.map((user) => (
                                     <CommandItem
                                       value={user.label}
@@ -391,6 +414,7 @@ export default function Detail() {
                     Below are the files uploaded
                   </p>
                   {medias.length > 0 &&
+                    // @ts-expect-error is ok
                     medias.map((media, id) => (
                       <div key={id} className='mb-2 mt-2'>
                         <div className='space-y-1 flex items-center'>
@@ -446,7 +470,10 @@ export default function Detail() {
                           form.reset({
                             files: null,
                           });
-                          inputRef.current!.value = null;
+                          {
+                             /*// @ts-expect-error is ok */
+                          }
+                          inputRef.current!. value = null;
                         }}
                       >
                         Remove files
@@ -483,7 +510,7 @@ export default function Detail() {
             <Card className='w-full'>
               <CardHeader>
                 <CardTitle>Logs</CardTitle>
-
+                {/*// @ts-expect-error is ok */}
                 {logs.map((log) => (
                   <div key={log.id}>
                     <div className='text-sm font-medium leading-none mt-4'>
@@ -512,93 +539,101 @@ export default function Detail() {
             </Card>
           </div>
 
-          <div className="flex justify-between mt-2">
-
-          {ememo.step == "Drafted" && ememo.assignnee.fullname ==  AuthUser.fullname && (
-            <>
-              {busy ? (
-                <Button disabled>
-                  <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-                  Please wait
-                </Button>
-              ) : (
-                <Button type='submit'>
-                  Save Edit
-                </Button>
+          <div className='flex justify-between mt-2'>
+            {/*// @ts-expect-error is ok */}
+            {ememo.step == "Drafted" &&
+              ememo.assignnee.id == AuthUser.id && (
+                <>
+                  {busy ? (
+                    <Button disabled>
+                      <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                      Please wait
+                    </Button>
+                  ) : (
+                    <Button type='submit'>Save Edit</Button>
+                  )}
+                </>
               )}
-            </>
-          )}
-             {AuthorizeToreject && ememo.step != "Drafted" && (
-        <AlertDialog open={open2} onOpenChange={setOpen2}>
-          <AlertDialogTrigger  className="secondary"> <ArrowBigLeftDash  className="self-baseline inline-flex text-red-500"/><span className="text-red-500">Reject</span></AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure to reject?</AlertDialogTitle>
-              <fetcher.Form method='put' action={`/reject/${ememo.id}`}>
-                <Input
-                  placeholder='for your comment'
-                  name='comment'
-                  id='comment'
-                />
-                <Button
-                  type='submit'
-                  className='mt-4 w-full'
-                  onClick={() => {
-                    setOpen2(false);
-                  }}
-                >
-                  Reject
-                </Button>
-              </fetcher.Form>
-              <AlertDialogDescription>
-                This action cannot be recall
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
-       {Authorize && (
-        <AlertDialog open={open} onOpenChange={setOpen}>
-          <AlertDialogTrigger  className="secondary"> <ArrowBigRightDash className="self-baseline inline-flex"/>Process Next</AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure to approve?</AlertDialogTitle>
-              <fetcher.Form method='put' action={`/approve/${ememo.id}`}>
-                <Input
-                  placeholder='for your comment'
-                  name='comment'
-                  id='comment'
-                />
-                <Button
-                  type='submit'
-                  className='mt-4 w-full'
-                  onClick={() => {
-                    setOpen(false);
-                  }}
-                >
-                  Approve
-                </Button>
-              </fetcher.Form>
-              <AlertDialogDescription>
-                This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
 
+            {CanReject &&  (
+              <AlertDialog open={open2} onOpenChange={setOpen2}>
+                <AlertDialogTrigger className='secondary'>
+
+                  <ArrowBigLeftDash className='self-baseline inline-flex text-red-500' />
+                  <span className='text-red-500'>Reject</span>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure to reject?
+                    </AlertDialogTitle>
+                    <fetcher.Form method='put' action={`/reject/${ememo.id}`}>
+                      <Input
+                        placeholder='for your comment'
+                        name='comment'
+                        id='comment'
+                      />
+                      <Button
+                        type='submit'
+                        className='mt-4 w-full'
+                        onClick={() => {
+                          setOpen2(false);
+                        }}
+                      >
+                        Reject
+                      </Button>
+                    </fetcher.Form>
+                    <AlertDialogDescription>
+                      This action cannot be recall
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+            {Authorize && (
+              <AlertDialog open={open} onOpenChange={setOpen}>
+                <AlertDialogTrigger className='secondary'>
+                  {" "}
+                  <ArrowBigRightDash className='self-baseline inline-flex' />
+                  Process Next
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure to approve?
+                    </AlertDialogTitle>
+                    <fetcher.Form method='put' action={`/approve/${ememo.id}`}>
+                      <Input
+                        placeholder='for your comment'
+                        name='comment'
+                        id='comment'
+                      />
+                      <Button
+                        type='submit'
+                        className='mt-4 w-full'
+                        onClick={() => {
+                          setOpen(false);
+                        }}
+                      >
+                        Approve
+                      </Button>
+                    </fetcher.Form>
+                    <AlertDialogDescription>
+                      This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </div>
-
         </form>
       </Form>
-
-
     </div>
   );
 }

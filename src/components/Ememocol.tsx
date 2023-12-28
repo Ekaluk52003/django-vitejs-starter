@@ -17,6 +17,7 @@ export const EmemoColumns: ColumnDef<Ememo>[] = [
     accessorKey: "number",
     header: "Number",
     // cell: (props) => (<Link to={`/dashboard/ememo/${props.row.original.id}`}><Iconlink className="w-4 inline-flex mr-1"/>{props.getValue()}</Link>)
+    // @ts-expect-error ignore //
     cell: (props) => (<Link to={`/dashboard/ememo/${props.getValue()}`}><Iconlink className="w-4 inline-flex mr-1"/>{props.getValue()}</Link>)
   },
   {
@@ -34,12 +35,14 @@ export const EmemoColumns: ColumnDef<Ememo>[] = [
   {
     accessorKey: "assignnee.fullname",
     header: "Assignnee",
+    // @ts-expect-error ignore //
     cell: (props) => <span>{ props.row.original.assignnee ? props.getValue() : "closed"}</span>
   },
 
   {
     accessorKey: "updated_at",
     header: "Updated_At",
+    // @ts-expect-error ignore //
     cell: (props) => <span>{dayjs(props.getValue()).format("D MMM D ddd, YYYY, HH:mm a")}</span>
   },
 ]

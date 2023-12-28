@@ -1,0 +1,76 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <style>
+
+
+      @page {
+        font-family: Pacifico;
+        margin: 3cm;
+        @bottom-left {
+          color: #2563eb;
+          content: '♥ Thank you!';
+        }
+        @bottom-right {
+          color: #a9a;
+          content: 'contact@courtbouillon.org | courtbouillon.org';
+          font-size: 9pt;
+        }
+      }
+
+      html {
+        color: #14213d;
+        font-family: Source Sans Pro;
+        font-size: 11pt;
+        line-height: 1.6;
+      }
+      body {
+        margin: 0;
+      }
+
+
+        </style>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="{% static '/assets/css/index.min.css' %}" />
+ <head>
+
+
+
+
+  <title>Report</title>
+
+</head>
+
+
+<body>
+  <h1 class="text-3xl font-bold underline text-clifford">
+    Hello world!
+  </h1>
+  <div class="inline-flex items-center border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent hover:bg-primary/80 bg-gray-50 text-gray-900 text-lg rounded-sm my-4">Drafted</div>
+  {{ object.title }}
+  {{ object.content |safe  }}
+
+  {% for log in object.log.all %}
+   id: {{ log.description}}
+   des: {{ log.description}}
+
+  {% endfor %}
+
+  <h1>Media</h1>
+
+  {% for media in object.media.all %}
+  url: {{ media.file_url}}
+
+
+ {% endfor %}
+</body>
+
+</html>
+
+
+

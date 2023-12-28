@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 
+// @ts-expect-error ok //
 const MenuBar = ({ editor }) => {
   if (!editor) {
     return null;

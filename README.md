@@ -33,6 +33,7 @@ $ fly deploy
 ### fly.io command
 $ fly ssh console
 $ fly status
+$ fly secrets list
 attach postgres to App "django-postgres" is prosgres app name
 $ flyctl postgres attach django-postgres
 

@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
+import { useToast } from "@/components/ui/use-toast";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -33,7 +33,7 @@ import { useLoaderData, useSubmit } from "react-router-dom";
 import { Trash2, FileText } from "lucide-react";
 import BreadCrumb from "@/components/breadcrumb";
 
-const MAX_FILE_SIZE = 100000;
+const MAX_FILE_SIZE = 2621440;
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
@@ -57,13 +57,7 @@ const formSchema = z.object({
 
   files: z
     .any()
-    .refine((files) => files?.length <= 2, "File upload not more than 2 files")
 
-    .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-      ".jpg, .jpeg, .png and .webp files are accepted."
-    )
-    .optional(),
 });
 type EmemoFormValues = z.infer<typeof formSchema>;
 
@@ -74,6 +68,7 @@ export default function Submit() {
   const inputRef = useRef(null);
   const data = useLoaderData();
   const submit = useSubmit();
+  const { toast } = useToast();
 
   const users = data;
 
@@ -108,22 +103,45 @@ export default function Submit() {
       data.append(key, value);
     });
 
-    for (let i = 0; i < values.files.length; i++) {
-      data.append("files", values.files[i]);
-
-      if (values.files[i].size > MAX_FILE_SIZE) {
+    if (values.files) {
+      console.log(values.files);
+      if (values.files.length  > 5) {
         return form.setError("files", {
           type: "manual",
-          message: `${values.files[i].name} is over limit`,
+          message: `files upload allow 5 including uploaded files.`,
         });
       }
-      if (!ACCEPTED_IMAGE_TYPES.includes(values.files[i].type)) {
-        return form.setError("files", {
-          type: "manual",
-          message: `wrong file type`,
-        });
+
+      for (let i = 0; i < values.files.length; i++) {
+        data.append("files", values.files[i]);
+
+        if (values.files[i].size > MAX_FILE_SIZE) {
+          return form.setError("files", {
+            type: "manual",
+            message: `${values.files[i].name} is over limit`,
+          });
+        }
+
+        if (!ACCEPTED_IMAGE_TYPES.includes(values.files[i].type)) {
+          return form.setError("files", {
+            type: "manual",
+            message: `wrong file type`,
+          });
+        }
       }
     }
+
+
+
+
+     // @ts-expect-error ignore //
+    inputRef.current!.value = null;
+    toast({
+      title: "Saving",
+      description: "we are updating and saving information",
+    });
+
+
     // you must add encType: "multipart/form-data" for file upload to work
     submit(data, { method: "post", encType: "multipart/form-data" });
   }
@@ -180,6 +198,7 @@ Hi, Welcome back 👋
                       )}
                     >
                       {field.value
+                          // @ts-expect-error is ok
                         ? users.find((user) => user.value === field.value)
                             ?.label
                         : "Select User"}
@@ -192,6 +211,7 @@ Hi, Welcome back 👋
                     <CommandInput placeholder='Search language...' />
                     <CommandEmpty>No User found.</CommandEmpty>
                     <CommandGroup>
+                               {/*// @ts-expect-error is ok */}
                       {users.map((user) => (
                         <CommandItem
                           value={user.label}
@@ -238,6 +258,7 @@ Hi, Welcome back 👋
                       )}
                     >
                       {field.value
+                               // @ts-expect-error is ok
                         ? users.find((user) => user.value === field.value)
                             ?.label
                         : "Select user"}
@@ -250,6 +271,7 @@ Hi, Welcome back 👋
                     <CommandInput placeholder='Search language...' />
                     <CommandEmpty>No User found.</CommandEmpty>
                     <CommandGroup>
+                               {/*// @ts-expect-error is ok */}
                       {users.map((user) => (
                         <CommandItem
                           value={user.label}
@@ -322,6 +344,7 @@ Hi, Welcome back 👋
                     form.reset({
                       files: null,
                     });
+                             {/*// @ts-expect-error is ok */}
                     inputRef.current!.value = null;
                   }}
                 >

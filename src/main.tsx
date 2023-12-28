@@ -84,7 +84,7 @@ const router = createBrowserRouter([
             element: <Detail />,
             action: editEmemoAction,
             loader:EmemoLoader,
-            errorElement:<Errorpage/>
+            // errorElement:<Errorpage/>
 
           }
 

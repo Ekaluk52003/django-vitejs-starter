@@ -20,7 +20,7 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(' ')
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS  = os.getenv('ALLOWED_HOSTS').split(' ')
 
 
 # Application definition
@@ -128,11 +128,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# when run collectstatic Django will look for these folders
 STATICFILES_DIRS = [
     BASE_DIR / "dist",
     BASE_DIR / "public",
 ]
-
+# where Djang go server satic file
 STATIC_ROOT = BASE_DIR / "static"
 
 # Default primary key field type
@@ -169,7 +171,7 @@ if FILE_UPLOAD_STORAGE == "s3":
     AWS_DEFAULT_ACL = 'private'
     #The number of seconds that a generated URL is valid for
     # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#configuration-settings
-    AWS_QUERYSTRING_EXPIRE = 5 # seconds
+    AWS_QUERYSTRING_EXPIRE = 1800 # seconds
 
 
 

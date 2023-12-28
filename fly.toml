@@ -1,13 +1,16 @@
-# fly.toml app configuration file generated for django-vitejs on 2023-12-05T11:02:26+07:00
+# fly.toml app configuration file generated for django-ememo on 2023-12-28T14:33:48+07:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "django-vitejs"
+app = "django-ememo"
 primary_region = "sin"
 console_command = "/code/manage.py shell"
 
 [build]
+
+[deploy]
+  release_command = "python manage.py migrate --noinput"
 
 [env]
   PORT = "8000"
@@ -28,7 +31,3 @@ console_command = "/code/manage.py shell"
 [[statics]]
   guest_path = "/code/static"
   url_prefix = "/static/"
-
-[deploy]
-  release_command = "python manage.py migrate --noinput"
-

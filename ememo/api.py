@@ -12,7 +12,7 @@ from api.models import CustomUser, Runnumber
 from datetime import datetime
 from django.db.models import Q
 from django.core.paginator import Paginator
-
+from ninja.errors import HttpError
 
 # class EmemoSchema(ModelSchema):
 #     class Config:
@@ -113,7 +113,11 @@ def approve(request, payload: Comment, ememo_id: int):
 
     if request.auth.id != ememo.assignnee_id:
         return 401, {'message': 'You are not assigned to this'}
-    flow = FlowEmemo.objects.get(source=ememo.step)
+    try:
+        flow = FlowEmemo.objects.get(source=ememo.step)
+    except FlowEmemo.DoesNotExist as e:
+        return 401, {'message': 'Cannot complete the reject action'}
+
     ememo.step = flow.target
 
     if flow.target == "PRE_APPROVE" :
@@ -140,7 +144,10 @@ def reject(request, payload: Comment, ememo_id: int):
 
     if request.auth.id != ememo.assignnee_id and request.auth.id != ememo.author_id:
         return 401, {'message': 'You are not authorize'}
-    flow = FlowEmemo.objects.get(source=ememo.step)
+    try:
+       flow = FlowEmemo.objects.get(source=ememo.step)
+    except FlowEmemo.DoesNotExist as e:
+        raise HttpError(503, "Service Unavailable. Please retry later.")
     if flow.can_reject == False:
         return 401, {'message': 'You cannot reject'}
     ememo.assignnee = ememo.author

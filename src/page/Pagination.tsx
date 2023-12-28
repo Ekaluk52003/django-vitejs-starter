@@ -1,7 +1,6 @@
 import {
   useLoaderData,
   Form,
-  useSubmit,
   useSearchParams,
 } from "react-router-dom";
 import { DataTable } from "@/components/data-table";
@@ -18,8 +17,8 @@ export default function Pagination() {
   // @ts-expect-error ignore //
 
   const { notes, page, term, perpage } = useLoaderData();
-  const submit = useSubmit();
-  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [, setSearchParams] = useSearchParams();
 
   return (
     <>
@@ -41,6 +40,7 @@ export default function Pagination() {
       <DataTable
         columns={columns}
         data={notes.results}
+        // @ts-expect-error is ok
         has_previous={notes.has_previous}
         has_next={notes.has_next}
         page={page}

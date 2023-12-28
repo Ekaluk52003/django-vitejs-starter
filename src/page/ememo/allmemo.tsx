@@ -2,7 +2,7 @@ import {
   useLoaderData,
   Form,
   useSearchParams,
-  useSubmit,
+
 } from "react-router-dom";
 import { DataTable } from "@/components/data-table";
 import { EmemoColumns } from "@/components/Ememocol";
@@ -24,8 +24,10 @@ export default function Allmemo() {
   // @ts-expect-error ignore //
   const { ememos, page, term, perpage, me } = useLoaderData();
   const inputRef = useRef(null);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const submit = useSubmit();
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [, setSearchParams] = useSearchParams();
+
   const [checked, setChecked] = useState(false);
 
   return (

@@ -1,6 +1,6 @@
 import { redirect} from "react-router-dom";
 import Cookies from "universal-cookie";
-
+import { json } from "react-router-dom";
 const cookies = new Cookies();
 
 export const logoutAction = async() => {
@@ -16,7 +16,8 @@ export const logoutAction = async() => {
   return redirect("/login");
 }
 
-export const removeFileAction = async({ request, params}) => {
+// @ts-expect-error ignore //
+export const removeFileAction = async({ params}) => {
 
   await fetch(`/api/v1/ememo/media/delete/${params.ememo_id}`, {
     method:"DELETE",
@@ -123,7 +124,7 @@ export const ForgotPasswordAction = async({ request}) => {
 
 }
 
-
+// @ts-expect-error ignore //
 export const createEmemoAction = async({ request}) => {
 
   const formData = await request.formData();
@@ -142,6 +143,7 @@ export const createEmemoAction = async({ request}) => {
 return redirect(`/dashboard/ememo/${data.number}`)
 }
 
+// @ts-expect-error ignore //
 export const editEmemoAction = async({ request, params}) => {
 
   const formData = await request.formData();
@@ -161,7 +163,7 @@ export const editEmemoAction = async({ request, params}) => {
 
 }
 
-
+// @ts-expect-error ignore //
 
 export const approveAction = async({ request, params}) => {
 
@@ -194,7 +196,7 @@ export const approveAction = async({ request, params}) => {
   return null
 
 }
-
+// @ts-expect-error ignore //
 export const rejectAction = async({ request, params}) => {
 
   const formData = await request.formData();
@@ -208,7 +210,8 @@ export const rejectAction = async({ request, params}) => {
 
 
 
-  const reponse = await fetch(`/api/v1/ememo/reject/${params.ememo_id}`, {
+
+  const response = await fetch(`/api/v1/ememo/reject/${params.ememo_id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -217,12 +220,15 @@ export const rejectAction = async({ request, params}) => {
       credentials: "same-origin",
       body: JSON.stringify(approveForm ),
     });
-  if(!reponse.ok) {
 
-    return { error :"something wrong"}
+  if(!response.ok) {
+
+    throw new Response("something went wrong", { status: 403 });
   }
 
 
   return null
+
+
 
 }
