@@ -51,7 +51,7 @@ import {
   useFetcher,
   useNavigation,
   useRouteLoaderData,
-
+useActionData
 } from "react-router-dom";
 import {
   Trash2,
@@ -98,6 +98,8 @@ export default function Detail() {
   const submit = useSubmit();
   const { toast } = useToast();
   const navigation = useNavigation();
+  const ActionData = useActionData();
+  console.log(ActionData)
   const busy = navigation.state === "submitting";
   // @ts-expect-error ignore //
   const users = data.user;
@@ -108,12 +110,14 @@ export default function Detail() {
   // @ts-expect-error ignore //
   const logs = data.logs;
   const AuthUser = useRouteLoaderData("authloader");
-console.log("ASDASD", AuthUser)
+
   const AssignToUserId = ememo.assignnee ? ememo.assignnee.id : "No Assignee";
   const AssignToUserFullname = ememo.assignnee ? ememo.assignnee.fullname : "No Assignee";
+// @ts-expect-error ignore //
+  const Author = AuthUser.id == ememo.author.id
   // @ts-expect-error ignore //
   const Authorize = AuthUser.id ==  AssignToUserId;
-  const CanReject =  Authorize && ememo.step != "Drafted"
+  const CanReject =  Authorize && ememo.step != "Drafted" || Author
 
   const defaultValues: Partial<EmemoFormValues> = {
     title: ememo.title,
@@ -188,12 +192,15 @@ console.log("ASDASD", AuthUser)
     // @ts-expect-error ignore //
     inputRef.current!.value = null;
   }
-  console.log("adasdasdasddsadsdaasdasdasdasdasd")
+
   return (
     <div>
 
       <h2 className='text-3xl font-bold tracking-tight'>
         Ememo {ememo.number}👋
+        {ActionData  && ActionData.error && (
+              <h5 className='text-lg text-red-700'>sss</h5>
+            )}
       </h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>

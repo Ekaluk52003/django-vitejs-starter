@@ -1,6 +1,6 @@
 import { redirect} from "react-router-dom";
 import Cookies from "universal-cookie";
-import { json } from "react-router-dom";
+
 const cookies = new Cookies();
 
 export const logoutAction = async() => {
@@ -207,10 +207,6 @@ export const rejectAction = async({ request, params}) => {
   }
   const approveForm = Object.fromEntries(formData);
 // you must convert formdata(aray for request bofy form API) unless api require form data
-
-
-
-
   const response = await fetch(`/api/v1/ememo/reject/${params.ememo_id}`, {
       method: "PUT",
       headers: {
@@ -221,13 +217,13 @@ export const rejectAction = async({ request, params}) => {
       body: JSON.stringify(approveForm ),
     });
 
-  if(!response.ok) {
+    if(!response.ok) {
 
-    throw new Response("something went wrong", { status: 403 });
-  }
+      return { error :"something wrong"}
+    }
 
 
-  return null
+  return { success :true}
 
 
 
