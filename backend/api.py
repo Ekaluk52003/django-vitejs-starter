@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 import io
 from django.http import HttpResponse
 from api.api import router as auth_router
+from api.pdf_api import router as pdf_router
 from ememo.api import router as ememo_router
 from api.models import CustomUser
 from django.core.paginator import Paginator
@@ -25,6 +26,7 @@ api = NinjaAPI(csrf=True)
 
 api.add_router('/auth/', auth_router)
 api.add_router('/ememo/', ememo_router, tags=["Ememo Routes"])
+api.add_router('/pdf/', pdf_router, tags=["PDF Routes"])
 
 class HelloSchema(Schema):
     name: str = "world"

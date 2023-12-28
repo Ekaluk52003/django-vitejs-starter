@@ -94,7 +94,7 @@ export const paginationLoader = async ({request}) => {
 
       const data = await response.json()
 
-    return { ememos:data, page:parseInt(pageNumber as string), term:term, perpage:perpage}
+    return { ememos:data, page:parseInt(pageNumber as string), term:term, perpage:perpage, me:me}
 
     }
 
