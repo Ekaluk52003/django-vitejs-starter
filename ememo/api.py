@@ -23,8 +23,6 @@ from ninja.errors import HttpError
 #                          'number' 'created_at', 'updated_at']
 
 
-
-
 class EmemoIn(Schema):
     title: str
     content: str
@@ -39,6 +37,7 @@ class UserSchema(Schema):
     fullname: str = None
     jobtitle: str = None
 
+
 class EmemoSchemaIn(Schema):
 
     title: str
@@ -46,6 +45,7 @@ class EmemoSchemaIn(Schema):
     reviewer_id:  str = None
     approver_id:   str = None
     # reviewer:  UserSchema = None
+
 
 class EmemoOut(Schema):
     id: int
@@ -85,6 +85,7 @@ class LogSchema(Schema):
     logBy: UserSchema = None
     created_at: datetime
 
+
 class PaginatedEmemo(Schema):
     total_ememos: int
     total_pages: int
@@ -109,19 +110,20 @@ class emomoUpdate(Schema):
 
 @router.put('/approve/{ememo_id}', auth=django_auth)
 def approve(request, payload: Comment, ememo_id: int):
-    ememo = get_object_or_404(Ememo, id=ememo_id)
+    ememo = get_object_or_404(Ememo, number=ememo_id)
 
     if request.auth.id != ememo.assignnee_id:
         return 401, {'message': 'You are not assigned to this'}
     try:
         flow = FlowEmemo.objects.get(source=ememo.step)
     except FlowEmemo.DoesNotExist as e:
-        return 401, {'message': 'Cannot complete the reject action'}
+        return 401, {'message': 'Cannot complete the approve action'}
 
     ememo.step = flow.target
-
-    if flow.target == "PRE_APPROVE" :
-         ememo.assignnee = ememo.reviewer
+    if flow.target == "Drafted":
+        ememo.assignnee = ememo.author
+    if flow.target == "PRE_APPROVE":
+        ememo.assignnee = ememo.reviewer
     if flow.target == "FINAL_APPROVE":
         ememo.assignnee = ememo.approver
     if flow.target == "DONE":
@@ -140,18 +142,18 @@ def approve(request, payload: Comment, ememo_id: int):
 @router.put('/reject/{ememo_id}', auth=django_auth,  response={200: Message, 401: Message})
 def reject(request, payload: Comment, ememo_id: int):
 
-    ememo = get_object_or_404(Ememo, id=ememo_id)
+    ememo = get_object_or_404(Ememo, number=ememo_id)
 
     if request.auth.id != ememo.assignnee_id and request.auth.id != ememo.author_id:
         return 401, {'message': 'You are not authorize'}
     try:
-       flow = FlowEmemo.objects.get(source=ememo.step)
-    except FlowEmemo.DoesNotExist as e:
-        raise HttpError(503, "Service Unavailable. Please retry later.")
+        flow = FlowEmemo.objects.get(source=ememo.step)
+    except FlowEmemo.DoesNotExist:
+        return 401, {'message': 'Cannot complete the reject action'}
     if flow.can_reject == False:
         return 401, {'message': 'You cannot reject'}
     ememo.assignnee = ememo.author
-    ememo.step = "Drafted"
+    ememo.step = "Reject"
     ememo.save()
     log = Log()
     log.comment = payload.comment
@@ -189,7 +191,7 @@ def create_ememo(request, data: EmemoSchemaIn = Form(...), files: List[UploadedF
     ememo_created = Ememo.objects.create(title=data.title, content=data.content,  reviewer_id=data.reviewer_id, number=run_number.running_number,
                                          approver_id=data.approver_id, assignnee_id=request.auth.id, author_id=request.auth.id)
 
-    run_number.running_number =  run_number.running_number  + 1
+    run_number.running_number = run_number.running_number + 1
     run_number.save()
 
     if files is not None:
@@ -209,9 +211,9 @@ def getEmemo(request, ememo_id: int):
         return 404, {'message': 'Could not find ememo'}
 
     if request.user.groups.filter(name="Manager").exists():
-         return 200, ememo
+        return 200, ememo
 
-    if request.auth != ememo.assignnee and request.auth != ememo.author and request.auth != ememo.reviewer and request.auth != ememo.approver :
+    if request.auth != ememo.assignnee and request.auth != ememo.author and request.auth != ememo.reviewer and request.auth != ememo.approver:
         return 401, {'message': 'Unauthorized'}
     return 200, ememo
 
@@ -232,16 +234,21 @@ def ememo_media(request, ememo_id: int):
 
     return 200, media
 
+
 @router.get("/log/{ememo_id}", auth=django_auth, response=List[LogSchema])
 def ememo_log(request, ememo_id: int):
-    log= Log.objects.filter(ememo__number=ememo_id).order_by('-created_at')
+    log = Log.objects.filter(ememo__number=ememo_id).order_by('-created_at')
 
     return 200, log
+
 
 @router.put("/update/{ememo_id}")
 def update_ememo(request, ememo_id: int,  form: EmemoSchemaIn = Form(...), files: List[UploadedFile] = None):
 
-    ememo_update = Ememo.objects.get(number=ememo_id)
+    try:
+        ememo_update = Ememo.objects.get(number=ememo_id)
+    except Ememo.DoesNotExist as e:
+        return 404, {"message": "Could not find Ememo"}
 
     ememo_update.title = form.title
     ememo_update.content = form.content
@@ -266,49 +273,53 @@ def create_media(request, ememo_id: int, file: UploadedFile):
 @router.get("/pagination/allememo", auth=django_auth, response=PaginatedEmemo)
 def allmemo(request, perpage: int = 2, term='', me="me", page: int = 1):
 
-       if me:
-          print('true me')
-          ememos = Ememo.objects.filter(assignnee_id=request.auth.id).exclude(step="DONE").order_by('-created_at')
-          paginator = Paginator(ememos, perpage)
-          page_number = page
-          page_object = paginator.get_page(page_number)
-          response = {}
-          response["total_ememos"] = page_object.paginator.count
-          response["total_pages"] = page_object.paginator.num_pages
-          response["per_page"] = page_object.paginator.per_page
-          response["has_next"] = page_object.has_next()
-          response["has_previous"] = page_object.has_previous()
-          response["results"] = [ i for i in page_object.object_list.select_related('author', 'assignnee')]
-          return response
+    if me:
+        print('true me')
+        ememos = Ememo.objects.filter(assignnee_id=request.auth.id).exclude(
+            step="DONE").order_by('-created_at')
+        paginator = Paginator(ememos, perpage)
+        page_number = page
+        page_object = paginator.get_page(page_number)
+        response = {}
+        response["total_ememos"] = page_object.paginator.count
+        response["total_pages"] = page_object.paginator.num_pages
+        response["per_page"] = page_object.paginator.per_page
+        response["has_next"] = page_object.has_next()
+        response["has_previous"] = page_object.has_previous()
+        response["results"] = [
+            i for i in page_object.object_list.select_related('author', 'assignnee')]
+        return response
 #  manager = request.user.groups.filter(name="Manager").exists()
-       elif request.user.groups.filter(name="Manager").exists() :
-            print('true manager')
-            ememos = Ememo.objects.filter(Q(content__icontains="try once more") | Q(
+    elif request.user.groups.filter(name="Manager").exists():
+        print('true manager')
+        ememos = Ememo.objects.filter(Q(content__icontains="try once more") | Q(
             title__icontains=term)).order_by('-created_at')
-            paginator = Paginator(ememos, perpage)
-            page_number = page
-            page_object = paginator.get_page(page_number)
-            response = {}
-            response["total_ememos"] = page_object.paginator.count
-            response["total_pages"] = page_object.paginator.num_pages
-            response["per_page"] = page_object.paginator.per_page
-            response["has_next"] = page_object.has_next()
-            response["has_previous"] = page_object.has_previous()
-            response["results"] = [ i for i in page_object.object_list.select_related('author', 'assignnee')]
-            return response
+        paginator = Paginator(ememos, perpage)
+        page_number = page
+        page_object = paginator.get_page(page_number)
+        response = {}
+        response["total_ememos"] = page_object.paginator.count
+        response["total_pages"] = page_object.paginator.num_pages
+        response["per_page"] = page_object.paginator.per_page
+        response["has_next"] = page_object.has_next()
+        response["has_previous"] = page_object.has_previous()
+        response["results"] = [
+            i for i in page_object.object_list.select_related('author', 'assignnee')]
+        return response
 
-       else  :
-           print('true else')
-           ememos = Ememo.objects.filter(Q(content__icontains=term) | Q(title__icontains=term), Q(assignnee_id=request.auth.id) | Q(
-           reviewer_id=request.auth.id) | Q(approver_id=request.auth.id) | Q(author_id=request.auth.id)).order_by('-created_at')
-           paginator = Paginator(ememos, perpage)
-           page_number = page
-           page_object = paginator.get_page(page_number)
-           response = {}
-           response["total_ememos"] = page_object.paginator.count
-           response["total_pages"] = page_object.paginator.num_pages
-           response["per_page"] = page_object.paginator.per_page
-           response["has_next"] = page_object.has_next()
-           response["has_previous"] = page_object.has_previous()
-           response["results"] = [  i for i in page_object.object_list.select_related('author', 'assignnee')]
-           return response
+    else:
+        print('true else')
+        ememos = Ememo.objects.filter(Q(content__icontains=term) | Q(title__icontains=term), Q(assignnee_id=request.auth.id) | Q(
+            reviewer_id=request.auth.id) | Q(approver_id=request.auth.id) | Q(author_id=request.auth.id)).order_by('-created_at')
+        paginator = Paginator(ememos, perpage)
+        page_number = page
+        page_object = paginator.get_page(page_number)
+        response = {}
+        response["total_ememos"] = page_object.paginator.count
+        response["total_pages"] = page_object.paginator.num_pages
+        response["per_page"] = page_object.paginator.per_page
+        response["has_next"] = page_object.has_next()
+        response["has_previous"] = page_object.has_previous()
+        response["results"] = [
+            i for i in page_object.object_list.select_related('author', 'assignnee')]
+        return response

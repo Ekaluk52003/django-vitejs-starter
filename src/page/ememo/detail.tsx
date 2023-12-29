@@ -29,7 +29,7 @@ import {
 import { Loader2, CalendarClock, Contact } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
+  Form as ShadForm,
   FormControl,
   FormDescription,
   FormField,
@@ -51,7 +51,7 @@ import {
   useFetcher,
   useNavigation,
   useRouteLoaderData,
-useActionData
+  Form,
 } from "react-router-dom";
 import {
   Trash2,
@@ -89,7 +89,6 @@ const formSchema = z.object({
 type EmemoFormValues = z.infer<typeof formSchema>;
 
 export default function Detail() {
-
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
   const inputRef = useRef(null);
@@ -98,8 +97,8 @@ export default function Detail() {
   const submit = useSubmit();
   const { toast } = useToast();
   const navigation = useNavigation();
-  const ActionData = useActionData();
-  console.log(ActionData)
+
+
   const busy = navigation.state === "submitting";
   // @ts-expect-error ignore //
   const users = data.user;
@@ -112,12 +111,14 @@ export default function Detail() {
   const AuthUser = useRouteLoaderData("authloader");
 
   const AssignToUserId = ememo.assignnee ? ememo.assignnee.id : "No Assignee";
-  const AssignToUserFullname = ememo.assignnee ? ememo.assignnee.fullname : "No Assignee";
-// @ts-expect-error ignore //
-  const Author = AuthUser.id == ememo.author.id
+  const AssignToUserFullname = ememo.assignnee
+    ? ememo.assignnee.fullname
+    : "No Assignee";
   // @ts-expect-error ignore //
-  const Authorize = AuthUser.id ==  AssignToUserId;
-  const CanReject =  Authorize && ememo.step != "Drafted" || Author
+  const Author = AuthUser.id == ememo.author.id;
+  // @ts-expect-error ignore //
+  const Authorize = AuthUser.id == AssignToUserId;
+  const CanReject = (Authorize && ememo.step != "Drafted") || Author;
 
   const defaultValues: Partial<EmemoFormValues> = {
     title: ememo.title,
@@ -143,8 +144,6 @@ export default function Detail() {
       name.push(fileNames[i].name);
     }
   }
-
-
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const data = new FormData();
@@ -195,14 +194,11 @@ export default function Detail() {
 
   return (
     <div>
-
       <h2 className='text-3xl font-bold tracking-tight'>
         Ememo {ememo.number}👋
-        {ActionData  && ActionData.error && (
-              <h5 className='text-lg text-red-700'>sss</h5>
-            )}
+
       </h2>
-      <Form {...form}>
+      <ShadForm {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className='mb-6'>
             <FormField
@@ -478,9 +474,9 @@ export default function Detail() {
                             files: null,
                           });
                           {
-                             /*// @ts-expect-error is ok */
+                            /*// @ts-expect-error is ok */
                           }
-                          inputRef.current!. value = null;
+                          inputRef.current!.value = null;
                         }}
                       >
                         Remove files
@@ -548,24 +544,28 @@ export default function Detail() {
 
           <div className='flex justify-between mt-2'>
             {/*// @ts-expect-error is ok */}
-            {ememo.step == "Drafted" &&
-              ememo.assignnee.id == AuthUser.id && (
-                <>
-                  {busy ? (
-                    <Button disabled>
-                      <Loader2 className='w-4 h-4 mr-2 animate-spin' />
-                      Please wait
-                    </Button>
-                  ) : (
-                    <Button type='submit'>Save Edit</Button>
-                  )}
-                </>
-              )}
+            {ememo.step == "Drafted" && ememo.assignnee.id == AuthUser.id && (
+              <>
+                {busy ? (
+                  <Button disabled>
+                    <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                    Please wait
+                  </Button>
+                ) : (
+                  <Button type='submit'>Save Edit</Button>
+                )}
+              </>
+            )}
 
-            {CanReject &&  (
+          </div>
+        </form>
+      </ShadForm>
+
+
+     <div className="flex justify-between mt-4">
+     {CanReject && (
               <AlertDialog open={open2} onOpenChange={setOpen2}>
                 <AlertDialogTrigger className='secondary'>
-
                   <ArrowBigLeftDash className='self-baseline inline-flex text-red-500' />
                   <span className='text-red-500'>Reject</span>
                 </AlertDialogTrigger>
@@ -574,22 +574,18 @@ export default function Detail() {
                     <AlertDialogTitle>
                       Are you absolutely sure to reject?
                     </AlertDialogTitle>
-                    <fetcher.Form method='put' action={`/reject/${ememo.id}`}>
+                    <Form method='put' >
                       <Input
-                        placeholder='for your comment'
+                        placeholder='for your comment to reject'
                         name='comment'
-                        id='comment'
+                        id='reject'
                       />
-                      <Button
-                        type='submit'
-                        className='mt-4 w-full'
-                        onClick={() => {
+                      <Button type='submit' variant="destructive" name='intent' value='reject' className="w-full mt-2"  onClick={() => {
                           setOpen2(false);
-                        }}
-                      >
+                        }}>
                         Reject
                       </Button>
-                    </fetcher.Form>
+                    </Form>
                     <AlertDialogDescription>
                       This action cannot be recall
                     </AlertDialogDescription>
@@ -600,34 +596,32 @@ export default function Detail() {
                 </AlertDialogContent>
               </AlertDialog>
             )}
-            {Authorize && (
+         {Authorize && (
               <AlertDialog open={open} onOpenChange={setOpen}>
                 <AlertDialogTrigger className='secondary'>
                   {" "}
-                  <ArrowBigRightDash className='self-baseline inline-flex' />
+
                   Process Next
+                  <ArrowBigRightDash className='self-baseline inline-flex' />
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
                       Are you absolutely sure to approve?
                     </AlertDialogTitle>
-                    <fetcher.Form method='put' action={`/approve/${ememo.id}`}>
+                    <Form method='put'>
                       <Input
-                        placeholder='for your comment'
+                        placeholder='for your comment to approve'
                         name='comment'
-                        id='comment'
+                        id='approve'
                       />
-                      <Button
-                        type='submit'
-                        className='mt-4 w-full'
-                        onClick={() => {
+
+                      <Button type='submit'  name='intent' value='approve' className="w-full mt-2"  onClick={() => {
                           setOpen(false);
-                        }}
-                      >
+                        }}>
                         Approve
                       </Button>
-                    </fetcher.Form>
+                    </Form>
                     <AlertDialogDescription>
                       This action cannot be undone.
                     </AlertDialogDescription>
@@ -638,9 +632,9 @@ export default function Detail() {
                 </AlertDialogContent>
               </AlertDialog>
             )}
-          </div>
-        </form>
-      </Form>
+     </div>
+
+
     </div>
   );
 }

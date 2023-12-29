@@ -84,7 +84,7 @@ const router = createBrowserRouter([
             element: <Detail />,
             action: editEmemoAction,
             loader:EmemoLoader,
-            // errorElement:<Errorpage/>
+            errorElement:<Errorpage/>
 
           }
 
@@ -105,14 +105,14 @@ const router = createBrowserRouter([
   path: "/remove-file/:ememo_id",
   action: removeFileAction,
 },
-{
-  path: "/approve/:ememo_id",
-  action: approveAction,
-},
-{
-  path: "/reject/:ememo_id",
-  action: rejectAction,
-}
+// {
+//   path: "/approve/:ememo_id",
+//   action: approveAction,
+// },
+// {
+//   path: "/reject/:ememo_id",
+//   action: rejectAction,
+// }
 
 
 ]);

@@ -7,6 +7,8 @@ from api.models import CustomUser
 
 Step = (
           ("Drafted", "Drafted"),
+           ("Reject", "Reject"),
+            ("Cancel", "Cancel"),
           ("PRE_APPROVE", "PRE_APPROVE"),
           ("FINAL_APPROVE", "FINAL_APPROVE"),
           ("DONE", "DONE"),
