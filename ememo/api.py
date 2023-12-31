@@ -36,6 +36,7 @@ class UserSchema(Schema):
     id: int
     fullname: str = None
     jobtitle: str = None
+    email:str = None
 
 
 class EmemoSchemaIn(Schema):

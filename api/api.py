@@ -5,6 +5,12 @@ from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth.tokens import default_token_generator
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.http import HttpResponse
+from api.models import CustomUser
+from django.db.models.query_utils import Q
+from django import template
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import EmailMultiAlternatives
 
 
 from django.contrib.auth.forms import (
@@ -74,16 +80,32 @@ def me(request):
     auth=None
 )
 def request_password_reset(request, data: RequestPasswordResetIn):
-    form = PasswordResetForm(data.dict())
-    if form.is_valid():
-        form.save(
-            request=request,
-            extra_email_context=(
-                {'frontend_url': settings.FRONTEND_URL} if
-                hasattr(settings, 'FRONTEND_URL') else None
-            ),
-        )
-    return 204, None
+    password_reset_form = PasswordResetForm(data.dict())
+    if password_reset_form.is_valid():
+       data = password_reset_form.cleaned_data['email']
+       associated_users = CustomUser.objects.filter(Q(email=data))
+
+       if associated_users.exists():
+           for user in associated_users:
+               subject = "Password Reset Requested"
+               plaintext = template.loader.get_template('registration/password_reset_email.txt')
+               htmltemp = template.loader.get_template('registration/email.html')
+               c = {
+					"email":user.email,
+					'domain':settings.FRONTEND_URL,
+					'site_name': settings.FRONTEND_URL,
+					"uid": urlsafe_base64_encode(force_bytes(user.pk)),
+					"user": user,
+					'token': default_token_generator.make_token(user),
+					'protocol': 'http',
+					}
+               text_content = plaintext.render(c)
+               html_content = htmltemp.render(c)
+               msg = EmailMultiAlternatives(subject, text_content, 'Website <ekaluk.pong@yahoo.com>', [user.email], headers = {'Reply-To': 'admin@example.com'})
+               msg.attach_alternative(html_content, "text/html")
+               msg.send()
+
+       return 204, None
 
 @router.post(
     '/reset_password',

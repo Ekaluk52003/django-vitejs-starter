@@ -175,9 +175,21 @@ if FILE_UPLOAD_STORAGE == "s3":
 
 
 
+DEFAULT_FROM_EMAIL = 'ekaluk.pong@yahoo.com'
+
+# EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", default="local")
+# if  EMAIL_BACKEND == "ses":
+EMAIL_BACKEND = 'django_ses.SESBackend'
+AWS_SES_REGION_NAME =  os.getenv('AWS_SES_REGION_NAME')
+AWS_SES_REGION_ENDPOINT =  os.getenv('AWS_SES_REGION_ENDPOINT')
+AWS_SES_ACCESS_KEY_ID = os.getenv('AWS_SES_ACCESS_KEY_ID')
+AWS_SES_SECRET_ACCESS_KEY = os.getenv('AWS_SES_SECRET_ACCESS_KEY')
+
+# if  EMAIL_BACKEND == "local":
+#     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+FRONTEND_URL=os.getenv("FRONTEND_URL", default="http://127.0.0.1:8000")
 
-FRONTEND_URL="http://127.0.0.1:8000/"
+
 

@@ -52,6 +52,7 @@ class FlowEmemo(models.Model):
     source =  models.CharField(max_length=13, choices=Step)
     target =  models.CharField(max_length=13, choices=Step)
     moderator =  models.CharField(max_length=13, default='reviewer', blank=True, null=True,)
+    # emailTo =  models.CharField(max_length=13, default='reviewer', blank=True, null=True,)
     can_revert = models.BooleanField(default=True, blank=True, null=True,)
     can_reject = models.BooleanField(default=True, blank=True, null=True,)
 

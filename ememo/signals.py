@@ -6,8 +6,25 @@ from .models import Ememo, FlowEmemo
 
 # @receiver(pre_save, sender=Ememo)
 # def change_step(sender, instance, **kwargs):
+#      print('print from signal', instance.step)
+#      if instance.step == "PRE_APPROVE" :
+#           print('sending email to f{instance.reviewer}')
+
+
+
+
+
+
+
+    #  email = instance.who
+    #  print(email)
+
+
+
+
+
 #     if instance.action == "Approve" :
-#         flow = FlowEmemo.objects.get(source=instance.step)
+
 #         print("step ememo",instance.step)
 #         print("flow target",flow.target)
 #         instance.step = flow.target
