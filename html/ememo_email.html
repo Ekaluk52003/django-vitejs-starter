@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html
   xmlns="http://www.w3.org/1999/xhtml"
@@ -610,6 +611,21 @@
                                         color: #666666;
                                       "
                                       >Submitted by:  {{ object.author.fullname  }}
+
+                                    </span>
+                                  </p>
+                                  <p style="font-size: 14px; line-height: 140%">
+                                    &nbsp;
+                                  </p>
+                                  <p style="font-size: 14px; line-height: 140%">
+                                    <span
+                                      style="
+                                        font-size: 18px;
+                                        line-height: 25.2px;
+
+                                      "
+                                      > <img src="data:image/png;base64,{{ qr_code_image_data }}" alt="QR Code">
+
                                     </span>
                                   </p>
                                 </div>

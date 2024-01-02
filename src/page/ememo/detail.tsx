@@ -62,12 +62,12 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 
 const MAX_FILE_SIZE = 2621440;
-const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-];
+// const ACCEPTED_IMAGE_TYPES = [
+//   "image/jpeg",
+//   "image/jpg",
+//   "image/png",
+//   "image/webp",
+// ];
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -104,8 +104,10 @@ export default function Detail() {
   const users = data.user;
   // @ts-expect-error ignore //
   const ememo = data.ememo;
+
   // @ts-expect-error ignore //
   const medias = data.medias;
+
   // @ts-expect-error ignore //
   const logs = data.logs;
   const AuthUser = useRouteLoaderData("authloader");
@@ -170,12 +172,12 @@ export default function Detail() {
           });
         }
 
-        if (!ACCEPTED_IMAGE_TYPES.includes(values.files[i].type)) {
-          return form.setError("files", {
-            type: "manual",
-            message: `wrong file type`,
-          });
-        }
+        // if (!ACCEPTED_IMAGE_TYPES.includes(values.files[i].type)) {
+        //   return form.setError("files", {
+        //     type: "manual",
+        //     message: `wrong file type`,
+        //   });
+        // }
       }
     }
 
@@ -231,12 +233,12 @@ export default function Detail() {
           <div>
             <div>
               {" "}
-              <Card className='w-full rounded-sm my-4'>
+              <Card className='w-full my-4 rounded-sm'>
                 <CardHeader>
                   <CardTitle>Step</CardTitle>
                   <div>Created by author: {ememo.author.fullname}</div>
                   Assign to : {AssignToUserFullname}
-                  <div className='text-sm font-medium leading-none mt-4'>
+                  <div className='mt-4 text-sm font-medium leading-none'>
                     <Step step={ememo.step} />
                   </div>
                   <CardTitle>User Details</CardTitle>
@@ -264,7 +266,7 @@ export default function Detail() {
                                         (user) => user.value === field.value
                                       )?.label
                                     : "Select User"}
-                                  <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                  <CaretSortIcon className='w-4 h-4 ml-2 opacity-50 shrink-0' />
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
@@ -329,7 +331,7 @@ export default function Detail() {
                                         (user) => user.value === field.value
                                       )?.label
                                     : "Select user"}
-                                  <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                  <CaretSortIcon className='w-4 h-4 ml-2 opacity-50 shrink-0' />
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
@@ -385,7 +387,7 @@ export default function Detail() {
                     control={form.control}
                     name='files'
                     render={({ field }) => (
-                      <div className='grid w-full max-w-sm items-center'>
+                      <div className='grid items-center w-full max-w-sm'>
                         <FormItem>
                           <FormLabel>Files</FormLabel>
                           <FormControl>
@@ -410,7 +412,7 @@ export default function Detail() {
                       </div>
                     )}
                   />
-                  <div className='text-sm font-medium leading-none mt-4'>
+                  <div className='mt-4 text-sm font-medium leading-none'>
                     Uploaded Files
                   </div>
                   <p className='text-sm text-muted-foreground'>
@@ -419,14 +421,14 @@ export default function Detail() {
                   {medias.length > 0 &&
                     // @ts-expect-error is ok
                     medias.map((media, id) => (
-                      <div key={id} className='mb-2 mt-2'>
-                        <div className='space-y-1 flex items-center'>
+                      <div key={id} className='mt-2 mb-2'>
+                        <div className='flex items-center space-y-1'>
                           <FileText className='w-5 h-5' />
                           <a
-                            href={media.file_url}
+                            href={`/api/v1/ememo/presigned_media/${media.filename}`}
                             className='text-sm font-medium leading-none'
                           >
-                            {media.file_url}
+                            {media.filename}
                           </a>
 
                           <button
@@ -443,7 +445,7 @@ export default function Detail() {
                         </div>
                       </div>
                     ))}
-                  <div className='text-sm font-medium leading-none mt-4 border-t max-w-sm pt-6'>
+                  <div className='max-w-sm pt-6 mt-4 text-sm font-medium leading-none border-t'>
                     Pending Uploaded
                   </div>
                   <p className='text-sm text-muted-foreground'>
@@ -453,10 +455,10 @@ export default function Detail() {
                     name.map((file, id) => (
                       <div
                         key={id}
-                        className='space-y-1 flex items-center mt-2'
+                        className='flex items-center mt-2 space-y-1'
                       >
                         <FileText className='w-5 h-5' />
-                        <div className='space-y-1 flex items-center'>
+                        <div className='flex items-center space-y-1'>
                           <p className='text-sm font-medium leading-none'>
                             {file}
                           </p>
@@ -473,9 +475,7 @@ export default function Detail() {
                           form.reset({
                             files: null,
                           });
-                          {
-                            /*// @ts-expect-error is ok */
-                          }
+                          { /*// @ts-expect-error is ok */ }
                           inputRef.current!.value = null;
                         }}
                       >
@@ -493,13 +493,13 @@ export default function Detail() {
             <Card className='w-full'>
               <CardHeader>
                 <CardTitle>Time</CardTitle>
-                <div className='text-sm font-medium leading-none mt-4'>
+                <div className='mt-4 text-sm font-medium leading-none'>
                   Created at :
                   <span className='text-sm text-muted-foreground'>
                     {createdAt}
                   </span>
                 </div>
-                <div className='text-sm font-medium leading-none mt-4'>
+                <div className='mt-4 text-sm font-medium leading-none'>
                   Updated at :
                   <span className='text-sm text-muted-foreground'>
                     {updatedAt}
@@ -516,10 +516,10 @@ export default function Detail() {
                 {/*// @ts-expect-error is ok */}
                 {logs.map((log) => (
                   <div key={log.id}>
-                    <div className='text-sm font-medium leading-none mt-4'>
+                    <div className='mt-4 text-sm font-medium leading-none'>
                       Details: {log.description}
                     </div>
-                    <div className='text-sm font-medium leading-none mt-4'>
+                    <div className='mt-4 text-sm font-medium leading-none'>
                       Comment: {log.comment || "-"}
                     </div>
                     <div>
@@ -566,7 +566,7 @@ export default function Detail() {
      {CanReject && (
               <AlertDialog open={open2} onOpenChange={setOpen2}>
                 <AlertDialogTrigger className='secondary'>
-                  <ArrowBigLeftDash className='self-baseline inline-flex text-red-500' />
+                  <ArrowBigLeftDash className='inline-flex text-red-500 self-baseline' />
                   <span className='text-red-500'>Reject</span>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
@@ -602,7 +602,7 @@ export default function Detail() {
                   {" "}
 
                   Process Next
-                  <ArrowBigRightDash className='self-baseline inline-flex' />
+                  <ArrowBigRightDash className='inline-flex self-baseline' />
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>

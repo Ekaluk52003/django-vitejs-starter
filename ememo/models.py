@@ -1,7 +1,7 @@
 from django.db import models
 from .validators import validate_file_size
 from api.models import CustomUser
-
+import os
 
 
 
@@ -47,6 +47,8 @@ class EmemoMedia(models.Model):
     def delete(self, *arg, **kwargs):
        self.file_url.delete()
        super().delete(*arg, **kwargs)
+    def filename(self):
+        return os.path.basename(self.file_url.name)
 
 class FlowEmemo(models.Model):
     source =  models.CharField(max_length=13, choices=Step)

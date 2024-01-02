@@ -13,6 +13,10 @@ from datetime import datetime
 from django.db.models import Q
 from django.core.paginator import Paginator
 from ninja.errors import HttpError
+import boto3
+import os
+from django.http import HttpResponse
+
 
 # class EmemoSchema(ModelSchema):
 #     class Config:
@@ -77,6 +81,7 @@ class EmemoOutPaginate(Schema):
 class Emedia(Schema):
     file_url: str
     id: str
+    filename: str
 
 
 class LogSchema(Schema):
@@ -234,6 +239,46 @@ def ememo_media(request, ememo_id: int):
     media = EmemoMedia.objects.filter(ememo__number=ememo_id)
 
     return 200, media
+
+@router.get("/presigned_media/{key}", auth=django_auth)
+def ememo_signed_media(request, key: str):
+
+    s3 = boto3.client('s3',
+        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+    )
+    obj = s3.get_object(
+        Bucket=os.getenv('AWS_STORAGE_BUCKET_NAME'),
+        # Key='files/'+key
+        Key='files/ememo/'+key
+    )
+
+    # response['Content-Type'] = 'application/pdf'
+    # response['Content-Disposition'] = 'inline; filename="{}.pdf"'.format('abc')
+
+    # response = HttpResponse(obj['Body'].read())
+    # response['Content-Disposition'] = f'attachment; filename="{key}"'
+
+    response = HttpResponse(obj['Body'])
+
+    type = obj['ResponseMetadata']['HTTPHeaders']['content-type']
+    print('cehck type', type)
+    if type == 'application/pdf' or type == 'text/html' :
+        print('hit this pdf/html')
+        response['Content-Type'] = obj['ResponseMetadata']['HTTPHeaders']['content-type']
+        response['Content-Disposition'] = 'inline; filename="{key}"'
+        return response
+    if type == 'image/png' or type == 'image/jpeg' or type =='image/png' or type =='image/webp' or type == 'image/jpg':
+        print('hit this img')
+        response['Content-Type'] = obj['ResponseMetadata']['HTTPHeaders']['content-type']
+        response['Content-Disposition'] = 'inline; filename="{key}"'
+        return response
+
+    else:
+        print('not the right type')
+        response['Content-Disposition'] = f'attachment; filename="{key}"'
+        return response
+
 
 
 @router.get("/log/{ememo_id}", auth=django_auth, response=List[LogSchema])
