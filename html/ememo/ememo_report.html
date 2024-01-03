@@ -270,21 +270,19 @@
   </div>
 
   <div class="logo-container">
-
-    <!-- D:\Django\django-vitejs\dist file here-->
     <img
-      style="height: 90px"
-      src="{% static '/logo2.jpg' %}"
+      style="height: 18px"
+      src="https://app.useanvil.com/img/email-logo-black.png"
     >
-
-
   </div>
+
 
   {% if object.step == "DONE" %}
   <p class="watermark">Approved</p>
   {% else %}
   <p class="watermark">Pending</p>
   {% endif %}
+
   <table class="invoice-info-container">
     <tr>
       <td rowspan="2" class="client-name">

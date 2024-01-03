@@ -2,8 +2,8 @@ from django.db import models
 from .validators import validate_file_size
 from api.models import CustomUser
 import os
-
-
+from django.contrib.postgres.fields import ArrayField
+from django import forms
 
 Step = (
           ("Drafted", "Drafted"),
@@ -12,6 +12,7 @@ Step = (
           ("PRE_APPROVE", "PRE_APPROVE"),
           ("FINAL_APPROVE", "FINAL_APPROVE"),
           ("DONE", "DONE"),
+               ("Any", "Any"),
 )
 
 class Ememo(models.Model):
@@ -51,15 +52,16 @@ class EmemoMedia(models.Model):
         return os.path.basename(self.file_url.name)
 
 class FlowEmemo(models.Model):
-    source =  models.CharField(max_length=13, choices=Step)
+    source =  models.CharField(max_length=13, choices=Step, blank=True, null=True,)
     target =  models.CharField(max_length=13, choices=Step)
-    moderator =  models.CharField(max_length=13, default='reviewer', blank=True, null=True,)
-    # emailTo =  models.CharField(max_length=13, default='reviewer', blank=True, null=True,)
-    can_revert = models.BooleanField(default=True, blank=True, null=True,)
-    can_reject = models.BooleanField(default=True, blank=True, null=True,)
+    contentEmail = models.TextField(verbose_name="Email Content", blank=True, null=True,)
+    cc = ArrayField(models.EmailField(verbose_name="Email CC", max_length=200), blank=True, null=True)
+    sendPDF = models.BooleanField(verbose_name="Send PDF", default=True, blank=True, null=True,)
+    sendEmail = models.BooleanField(verbose_name="Send email", default=True, blank=True, null=True,)
+    can_reject = models.BooleanField(verbose_name="can reject", default=True, blank=True, null=True,)
 
     def __str__(self):
-      return self.source + '->' + self.target + '->' + self.moderator
+      return self.source + '->' + self.target
 
 class Log(models.Model):
 

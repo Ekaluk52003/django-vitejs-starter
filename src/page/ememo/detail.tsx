@@ -98,7 +98,6 @@ export default function Detail() {
   const { toast } = useToast();
   const navigation = useNavigation();
 
-
   const busy = navigation.state === "submitting";
   // @ts-expect-error ignore //
   const users = data.user;
@@ -196,10 +195,24 @@ export default function Detail() {
 
   return (
     <div>
-      <h2 className='text-3xl font-bold tracking-tight'>
-        Ememo {ememo.number}👋
+      <div className="flex items-center justify-between">
 
+      <h2 className='text-3xl font-bold tracking-tight'>
+        Ememo {ememo.number}
       </h2>
+        <div>
+          <FileText className='inline-flex w-3 h-3' />
+          <a
+            href={`/api/v1/pdf/report/${ememo.number}`}
+            className='text-sm leading-none'
+          >
+            Export PDF
+          </a>
+        </div>
+
+
+      </div>
+
       <ShadForm {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className='mb-6'>
@@ -224,6 +237,7 @@ export default function Detail() {
               <FormItem>
                 <FormLabel>Content</FormLabel>
                 <FormControl>
+
                   <Tiptap content={ememo.content} onChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
@@ -475,7 +489,9 @@ export default function Detail() {
                           form.reset({
                             files: null,
                           });
-                          { /*// @ts-expect-error is ok */ }
+                          {
+                            /*// @ts-expect-error is ok */
+                          }
                           inputRef.current!.value = null;
                         }}
                       >
@@ -556,85 +572,93 @@ export default function Detail() {
                 )}
               </>
             )}
-
           </div>
         </form>
       </ShadForm>
 
+      <div className='flex justify-between mt-4'>
+        {CanReject && (
+          <AlertDialog open={open2} onOpenChange={setOpen2}>
+            <AlertDialogTrigger className='secondary'>
+              <ArrowBigLeftDash className='inline-flex text-red-500 self-baseline' />
+              <span className='text-red-500'>Reject</span>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Are you absolutely sure to reject?
+                </AlertDialogTitle>
+                <Form method='put'>
+                  <Input
+                    placeholder='for your comment to reject'
+                    name='comment'
+                    id='reject'
+                  />
+                  <Button
+                    type='submit'
+                    variant='destructive'
+                    name='intent'
+                    value='reject'
+                    className='w-full mt-2'
+                    onClick={() => {
+                      setOpen2(false);
+                    }}
+                  >
+                    Reject
+                  </Button>
+                </Form>
+                <AlertDialogDescription>
+                  This action cannot be recall
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+        {Authorize && (
+          <AlertDialog open={open} onOpenChange={setOpen}>
+            <AlertDialogTrigger className='secondary'>
+              {" "}
+              Process Next
+              <ArrowBigRightDash className='inline-flex self-baseline' />
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Are you absolutely sure to approve?
+                </AlertDialogTitle>
+                <Form method='put'>
+                  <Input
+                    placeholder='for your comment to approve'
+                    name='comment'
+                    id='approve'
+                  />
 
-     <div className="flex justify-between mt-4">
-     {CanReject && (
-              <AlertDialog open={open2} onOpenChange={setOpen2}>
-                <AlertDialogTrigger className='secondary'>
-                  <ArrowBigLeftDash className='inline-flex text-red-500 self-baseline' />
-                  <span className='text-red-500'>Reject</span>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure to reject?
-                    </AlertDialogTitle>
-                    <Form method='put' >
-                      <Input
-                        placeholder='for your comment to reject'
-                        name='comment'
-                        id='reject'
-                      />
-                      <Button type='submit' variant="destructive" name='intent' value='reject' className="w-full mt-2"  onClick={() => {
-                          setOpen2(false);
-                        }}>
-                        Reject
-                      </Button>
-                    </Form>
-                    <AlertDialogDescription>
-                      This action cannot be recall
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-         {Authorize && (
-              <AlertDialog open={open} onOpenChange={setOpen}>
-                <AlertDialogTrigger className='secondary'>
-                  {" "}
-
-                  Process Next
-                  <ArrowBigRightDash className='inline-flex self-baseline' />
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure to approve?
-                    </AlertDialogTitle>
-                    <Form method='put'>
-                      <Input
-                        placeholder='for your comment to approve'
-                        name='comment'
-                        id='approve'
-                      />
-
-                      <Button type='submit'  name='intent' value='approve' className="w-full mt-2"  onClick={() => {
-                          setOpen(false);
-                        }}>
-                        Approve
-                      </Button>
-                    </Form>
-                    <AlertDialogDescription>
-                      This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-     </div>
-
-
+                  <Button
+                    type='submit'
+                    name='intent'
+                    value='approve'
+                    className='w-full mt-2'
+                    onClick={() => {
+                      setOpen(false);
+                    }}
+                  >
+                    Approve
+                  </Button>
+                </Form>
+                <AlertDialogDescription>
+                  This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+      </div>
     </div>
   );
 }
