@@ -60,6 +60,7 @@ import {
   ArrowBigLeftDash,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import Editor from "@/components/ui/editor/editor";
 
 const MAX_FILE_SIZE = 2621440;
 // const ACCEPTED_IMAGE_TYPES = [
@@ -237,8 +238,8 @@ export default function Detail() {
               <FormItem>
                 <FormLabel>Content</FormLabel>
                 <FormControl>
-
-                  <Tiptap content={ememo.content} onChange={field.onChange} />
+               <Editor content={ememo.content} onChange={field.onChange} />
+                  {/* <Tiptap content={ememo.content} onChange={field.onChange} /> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
