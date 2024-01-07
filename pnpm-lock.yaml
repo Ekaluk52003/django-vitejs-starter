@@ -56,12 +56,24 @@ dependencies:
   '@tiptap/extension-color':
     specifier: ^2.1.13
     version: 2.1.13(@tiptap/core@2.1.13)(@tiptap/extension-text-style@2.1.13)
+  '@tiptap/extension-document':
+    specifier: ^2.1.13
+    version: 2.1.13(@tiptap/core@2.1.13)
   '@tiptap/extension-heading':
+    specifier: ^2.1.13
+    version: 2.1.13(@tiptap/core@2.1.13)
+  '@tiptap/extension-image':
+    specifier: ^2.1.13
+    version: 2.1.13(@tiptap/core@2.1.13)
+  '@tiptap/extension-paragraph':
     specifier: ^2.1.13
     version: 2.1.13(@tiptap/core@2.1.13)
   '@tiptap/extension-placeholder':
     specifier: ^2.1.13
     version: 2.1.13(@tiptap/core@2.1.13)(@tiptap/pm@2.1.13)
+  '@tiptap/extension-text':
+    specifier: ^2.1.13
+    version: 2.1.13(@tiptap/core@2.1.13)
   '@tiptap/extension-text-align':
     specifier: ^2.1.13
     version: 2.1.13(@tiptap/core@2.1.13)
@@ -80,6 +92,9 @@ dependencies:
   '@tiptap/starter-kit':
     specifier: ^2.1.13
     version: 2.1.13(@tiptap/pm@2.1.13)
+  '@weiruo/tiptap-extension-indent':
+    specifier: 2.0.4-1
+    version: 2.0.4-1(@tiptap/core@2.1.13)(@tiptap/pm@2.1.13)
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
@@ -116,6 +131,9 @@ dependencies:
   tailwindcss-animate:
     specifier: ^1.0.7
     version: 1.0.7(tailwindcss@3.3.5)
+  tiptap-extension-resizable-image:
+    specifier: ^0.3.0
+    version: 0.3.0(@tiptap/core@2.1.13)(@tiptap/pm@2.1.13)(@tiptap/react@2.1.13)(react@18.2.0)
   universal-cookie:
     specifier: ^6.1.1
     version: 6.1.1
@@ -2209,6 +2227,14 @@ packages:
       '@tiptap/pm': 2.1.13
     dev: false
 
+  /@tiptap/extension-image@2.1.13(@tiptap/core@2.1.13):
+    resolution: {integrity: sha512-7oVAos+BU4KR/zQsfltrd8hgIxKxyxZ19dhwb1BJI2Nt3Mnx+yFPRlRSehID6RT9dYqgW4UW5d6vh/3HQcYYYw==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+    dependencies:
+      '@tiptap/core': 2.1.13(@tiptap/pm@2.1.13)
+    dev: false
+
   /@tiptap/extension-italic@2.1.13(@tiptap/core@2.1.13):
     resolution: {integrity: sha512-HyDJfuDn5hzwGKZiANcvgz6wcum6bEgb4wmJnfej8XanTMJatNVv63TVxCJ10dSc9KGpPVcIkg6W8/joNXIEbw==}
     peerDependencies:
@@ -2593,6 +2619,16 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@weiruo/tiptap-extension-indent@2.0.4-1(@tiptap/core@2.1.13)(@tiptap/pm@2.1.13):
+    resolution: {integrity: sha512-veE9Euwwp3Z8RtWUDqeHt/hWPINpUzXhs0LCcljgEyvko7Ez0O80fm2cSf9gwkhz7bt0FGPVnHN4BVmfRfKSlg==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+      '@tiptap/pm': ^2.0.0
+    dependencies:
+      '@tiptap/core': 2.1.13(@tiptap/pm@2.1.13)
+      '@tiptap/pm': 2.1.13
+    dev: false
 
   /acorn-jsx@5.3.2(acorn@8.11.2):
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -4281,6 +4317,20 @@ packages:
     resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
     dependencies:
       '@popperjs/core': 2.11.8
+    dev: false
+
+  /tiptap-extension-resizable-image@0.3.0(@tiptap/core@2.1.13)(@tiptap/pm@2.1.13)(@tiptap/react@2.1.13)(react@18.2.0):
+    resolution: {integrity: sha512-aLi4xqUlQw4izkbR9o+UG8Et2l2myrLS7NX+Rag+QKZ84c3NLvyzpHuRv1knBOIqLBFWjLQjZB+i/+5yQ9Bl/g==}
+    peerDependencies:
+      '@tiptap/core': '>=2'
+      '@tiptap/pm': '>=2'
+      '@tiptap/react': '>=2'
+      react: '>=18'
+    dependencies:
+      '@tiptap/core': 2.1.13(@tiptap/pm@2.1.13)
+      '@tiptap/pm': 2.1.13
+      '@tiptap/react': 2.1.13(@tiptap/core@2.1.13)(@tiptap/pm@2.1.13)(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
     dev: false
 
   /to-fast-properties@2.0.0:

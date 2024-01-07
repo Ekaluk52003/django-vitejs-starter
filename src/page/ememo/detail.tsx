@@ -1,4 +1,4 @@
-import { Tiptap } from "@/components/Tiptap";
+// import { Tiptap } from "@/components/Tiptap";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
 import Step from "@/components/step";
@@ -490,9 +490,7 @@ export default function Detail() {
                           form.reset({
                             files: null,
                           });
-                          {
-                            /*// @ts-expect-error is ok */
-                          }
+                          {/*// @ts-expect-error is ok */}
                           inputRef.current!.value = null;
                         }}
                       >
