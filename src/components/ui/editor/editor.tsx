@@ -9,9 +9,18 @@ import { Indent } from '@weiruo/tiptap-extension-indent'
 import Underline from '@tiptap/extension-underline'
 import TextStyle from '@tiptap/extension-text-style'
 import { Color } from '@tiptap/extension-color'
+import Highlight from '@tiptap/extension-highlight'
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
+import Image from '@tiptap/extension-image'
 // import Document from '@tiptap/extension-document'
 // import Paragraph from '@tiptap/extension-paragraph'
 // import Text from '@tiptap/extension-text'
+
+
+
 
 interface EditorProps {
   content: string
@@ -21,9 +30,18 @@ interface EditorProps {
 
 const Editor = ({ content, placeholder, onChange }: EditorProps) => {
   const editor = useEditor({
-    extensions: [StarterKit,  ResizableImage.configure({
+    extensions: [StarterKit,
+      ResizableImage.configure({
       defaultWidth: 200,
       defaultHeight: 200,
+      async onUpload(file: File) {
+        /* replace with your own upload handler */
+        const src = URL.createObjectURL(file);
+        return {
+          src,
+          'data-keep-ratio': true,
+        };
+      },
     }),
     TextAlign.configure({
       types: ["heading", "paragraph"],
@@ -36,12 +54,24 @@ const Editor = ({ content, placeholder, onChange }: EditorProps) => {
   Underline,
   TextStyle,
   Color,
+  Image,
+  Highlight.configure({ multicolor: true }),
+  Table.extend({
+    renderHTML({ HTMLAttributes }) {
+        return ['div', { class: 'mytable' }, ['table', HTMLAttributes, ['tbody', 0]]];
+    },
+}),
+  TableRow,
+  TableHeader,
+  TableCell
   ],
-    content: content,
+
+    content: `${content} <img src="https://source.unsplash.com/8xznAGy4HcY/800x400" />`,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML())
     },
   })
+
 
   if (!editor) return <></>
 

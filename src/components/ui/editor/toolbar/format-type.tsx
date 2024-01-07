@@ -1,6 +1,6 @@
 
 import { Editor } from "@tiptap/react"
-
+import { PaintBucket, Type } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -75,11 +75,13 @@ export function FormatType({ editor }: FormatTypeProps) {
 
 
 export function FormatColor({ editor }: FormatTypeProps) {
-
+ //@ts-expect-error expect
   function convertRgbColorsToHex(string) {
     return string.replace(/rgb\(\d+,\s*\d+,\s*\d+\)/g,
+    //@ts-expect-error expect
       (rgbString) => "#" + rgbString
         .match(/\b(\d+)\b/g)
+         //@ts-expect-error expect
         .map((digit) =>
           parseInt(digit).toString(16).padStart(2, "0").toUpperCase()
          )
@@ -88,6 +90,7 @@ export function FormatColor({ editor }: FormatTypeProps) {
   }
   const value = () => {
        const  preColor = editor.getAttributes('textStyle').color
+
        if(!preColor) return "black"
 
      const color = convertRgbColorsToHex(editor.getAttributes('textStyle').color)
@@ -96,6 +99,7 @@ export function FormatColor({ editor }: FormatTypeProps) {
     if (editor.isActive('textStyle') && color == "#374151" ) return "black"
     if (editor.isActive('textStyle') && color == "#F00A29" ) return "red"
     if (editor.isActive('textStyle') && color == "#0943FF" ) return "blue"
+    if (editor.isActive('textStyle') && color == "#FFFFFF" ) return "white"
 
 
   }
@@ -112,21 +116,77 @@ export function FormatColor({ editor }: FormatTypeProps) {
       case "blue":
         editor.chain().focus().setColor('#0943FF').run()
         break
+      case "white":
+        editor.chain().focus().setColor('#FFFFFF').run()
+        break
     }
   }
 
   return (
     <Select onValueChange={onChange} defaultValue={value()} value={value()}>
-      <SelectTrigger className="h-8 w-[65px] mr-1">
+      <SelectTrigger className="h-8 w-[60px] mr-1">
         <SelectValue placeholder="Color" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectItem value="black"><div className="w-4 h-4 rounded-full bg-black ml-1"></div></SelectItem>
-          <SelectItem value="red"><div className="w-4 h-4 rounded-full bg-red-500 ml-1"></div></SelectItem>
-          <SelectItem value="blue"><div className="w-4 h-4 rounded-full bg-blue-700 ml-1"></div></SelectItem>
+          <SelectItem value="black"><Type className="w-4 h-4"/></SelectItem>
+          <SelectItem value="red"><Type className="w-4 h-4 text-red-500"/></SelectItem>
+          <SelectItem value="blue"><Type className="w-4 h-4 text-blue-500"/></SelectItem>
+          <SelectItem value="white"><Type className="w-4 h-4 text-gray-300"/></SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>
   )
 }
+
+
+export function FormatHilight({ editor }: FormatTypeProps) {
+
+   const value = () => {
+
+
+        if(!editor.isActive('highlight'))  return "clear"
+        if (editor.isActive('highlight',{ color: '#0adb0e' })) return "green"
+        if (editor.isActive('highlight',{ color: '#f2f206' })) return "yellow"
+        if (editor.isActive('highlight',{ color: '#f20a06' })) return "red"
+        if (editor.isActive('highlight',{ color: '#0694f2' })) return "sky"
+   }
+
+   const onChange = (value: string) => {
+
+     switch (value) {
+      case "clear":
+        editor.chain().focus().unsetHighlight().run()
+        break
+       case "green":
+         editor.chain().focus().toggleHighlight({ color:'#0adb0e'}).run()
+         break
+       case "yellow":
+         editor.chain().focus().toggleHighlight({ color:'#f2f206'}).run()
+         break
+       case "red":
+         editor.chain().focus().toggleHighlight({ color:'#f20a06'}).run()
+         break
+       case "sky":
+          editor.chain().focus().toggleHighlight({ color:'#0694f2'}).run()
+        break
+     }
+   }
+
+   return (
+     <Select onValueChange={onChange} defaultValue={value()} value={value()}>
+       <SelectTrigger className="h-8 w-[70px] mr-1">
+         <SelectValue placeholder="Hilight" />
+       </SelectTrigger>
+       <SelectContent>
+         <SelectGroup>
+          <SelectItem value="clear"><PaintBucket  className="h-4 w-4" /></SelectItem>
+           <SelectItem value="green"><PaintBucket  className="h-4 w-4 text-green-600" /></SelectItem>
+           <SelectItem value="yellow"><PaintBucket  className="h-4 w-4 text-yellow-500" /></SelectItem>
+           <SelectItem value="red"><PaintBucket  className="h-4 w-4 text-red-500" /></SelectItem>
+           <SelectItem value="sky"><PaintBucket  className="h-4 w-4 text-blue-600" /></SelectItem>
+         </SelectGroup>
+       </SelectContent>
+     </Select>
+   )
+ }

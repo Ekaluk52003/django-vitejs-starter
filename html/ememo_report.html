@@ -14,9 +14,9 @@
 
 
       body {
-        font-size: 18px;
-        font-family: 'sans-serif';
-        line-height: 2.2rem;
+        font-size: 16px;
+
+        line-height: 1.75rem;
       }
 
        img {
@@ -33,6 +33,44 @@
         text-indent: 9rem;
       }
 
+     /* This is a single-line comment */
+     table {
+      border-collapse: collapse;
+      margin: 0;
+      overflow: hidden;
+      table-layout: fixed;
+      width: 100%;
+  }
+
+
+      table th:not(.except-css) {
+      font-weight: bold;
+      text-align: left;
+
+  }
+
+   table th:not(.except-css) {
+
+    border: 1px solid #010911;
+    box-sizing: border-box;
+    min-width: 1em;
+    padding: 3px 5px;
+    position: relative;
+    vertical-align: top;
+    z-index: 1;
+}
+
+table td:not(.except-css) {
+
+  border: 1px solid #010911;
+  box-sizing: border-box;
+  min-width: 1em;
+  padding: 3px 5px;
+  position: relative;
+  vertical-align: top;
+  z-index: 1;
+}
+     /* end table */
       table {
         width: 100%;
         border-collapse: collapse;
@@ -42,7 +80,9 @@
         padding: 0;
       }
 
-      table tr td:last-child {
+
+
+      .alight-right {
         text-align: right;
       }
 
@@ -64,11 +104,15 @@
       }
 
       .logo-container {
-        margin: 20px 0 0px 0;
+        margin: 0px 0 0px 0;
+        position: absolute;
+        left: -0.5rem;
+        top:-2rem;
       }
 
       .invoice-info-container {
         font-size: 0.875em;
+        line-height: 0.875rem;
       }
       .invoice-info-container td {
         padding: 4px 0;
@@ -235,7 +279,7 @@
 	color: rgba(255, 5, 5, 0.17);
 	position: absolute;
   margin-top:60rem;
-	font-family: 'Denk One', sans-serif;
+
 	text-transform:uppercase;
   position: running(watermark);
 
@@ -243,7 +287,11 @@
 
 @page {
   size: a4 portrait;
-  margin: 25mm 20mm 20mm 25mm;
+  margin-top: 20mm;
+  margin-bottom: 20mm;
+  margin-right:20mm;
+  margin-left:25mm;
+
   @bottom-right {
     content: element(pageContainer);
   }
@@ -286,7 +334,7 @@
 
     <!-- D:\Django\django-vitejs\dist file here-->
     <img
-      style="height: 90px"
+      style="width:100px"
       src="{% static '/logo2.jpg' %}"
     >
 
@@ -299,31 +347,31 @@
   <p class="watermark">Pending</p>
   {% endif %}
   <table class="invoice-info-container">
-    <tr>
-      <td rowspan="2" class="client-name">
+    <tr class="except-css">
+      <td rowspan="2" class="client-name except-css">
       </td>
-      <td>
+      <td class="except-css alight-right">
         Anvil Co
       </td>
     </tr>
-    <tr>
-      <td>
+    <tr class="except-css">
+      <td class="except-css alight-right">
         123 Main Street
       </td>
     </tr>
-    <tr>
-      <td>
+    <tr class="except-css">
+      <td class="except-css">
 
       </td>
-      <td>
+      <td class="except-css alight-right">
         San Francisco CA, 94103
       </td>
     </tr>
-    <tr>
-      <td>
+    <tr class="except-css">
+      <td class="except-css">
         Ememo No: <strong>{{object.number }}</strong>
       </td>
-      <td>
+      <td class="except-css alight-right">
         hello@useanvil.com
       </td>
     </tr>
@@ -337,9 +385,12 @@
     <p class="text-light">File:</p>
     {% for media in object.media.all %}
     <p class="paragraph-content">{{ media.filename}}</p>
+    <p class="paragraph-content"> URL:{{ media.file_url}}
+
     {% endfor %}
   </div>
 
+  
   <div class="content-text">
     <p class="text-light">Log:</p>
     {% for log in object.log.all %}
@@ -357,14 +408,14 @@
   <table class="line-items-container">
     <thead>
       <tr>
-        <th>Aprrove by</th>
-        <th>Approved Date</th>
-        <th>Final status</th>
+        <th class="except-css">Aprrove by</th>
+        <th class="except-css">Approved Date</th>
+        <th class="except-css">Final status</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td class="payment-info">
+        <td class="payment-info except-css">
           <div>
 
             Approver By : <strong>{{ object.approver.fullname}}</strong>
@@ -374,8 +425,8 @@
             Reviewver By : <strong>{{ object.reviewer.fullname}}</strong>
           </div>
         </td>
-        <td class="large">{{ object.updated_at}}</td>
-        <td class="large total">{{ object.step}}</td>
+        <td class="large except-css">{{ object.updated_at}}</td>
+        <td class="large total except-css alight-right">{{ object.step}}</td>
       </tr>
     </tbody>
   </table>
