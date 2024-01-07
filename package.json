@@ -28,6 +28,7 @@
     "@tanstack/react-table": "^8.10.7",
     "@tiptap/extension-color": "^2.1.13",
     "@tiptap/extension-heading": "^2.1.13",
+    "@tiptap/extension-image": "^2.1.13",
     "@tiptap/extension-placeholder": "^2.1.13",
     "@tiptap/extension-text-align": "^2.1.13",
     "@tiptap/extension-text-style": "^2.1.13",
@@ -47,6 +48,7 @@
     "react-select": "^5.8.0",
     "tailwind-merge": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
+    "tiptap-extension-resizable-image": "^0.3.0",
     "universal-cookie": "^6.1.1",
     "zod": "^3.22.4"
   },
