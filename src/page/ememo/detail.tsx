@@ -438,6 +438,7 @@ export default function Detail() {
                     medias.map((media, id) => (
                       <div key={id} className='mt-2 mb-2'>
                         <div className='flex items-center space-y-1'>
+                     
                           <FileText className='w-5 h-5' />
                           <a
                             href={`/api/v1/ememo/presigned_media/${media.filename}`}

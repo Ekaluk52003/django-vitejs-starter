@@ -311,9 +311,9 @@ def update_ememo(request, ememo_id: int,  form: EmemoSchemaIn = Form(...), files
 
 @router.post("/media/new/{ememo_id}", auth=django_auth)
 def create_media(request, ememo_id: int, file: UploadedFile):
-    EmemoMedia.objects.create(ememo_id=ememo_id, file_url=file)
+    url = EmemoMedia.objects.create(ememo_id=ememo_id, file_url=file)
 
-    return {"success upload": True}
+    return {"url": url.file_url.url}
 
 
 @router.get("/pagination/allememo", auth=django_auth, response=PaginatedEmemo)

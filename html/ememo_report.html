@@ -377,6 +377,7 @@ table td:not(.except-css) {
     </tr>
   </table>
   <div class="content-text">
+
     <p class="text-light">Title:</p> <h3 class="heading"> {{ object.title }}</h3>
     <p class="text-light">Content:</p> <p class="paragraph-content">{{ object.content |safe  }}</p>
   </div>
@@ -385,12 +386,14 @@ table td:not(.except-css) {
     <p class="text-light">File:</p>
     {% for media in object.media.all %}
     <p class="paragraph-content">{{ media.filename}}</p>
-    <p class="paragraph-content"> URL:{{ media.file_url}}
+    <!-- <img src="{{ media.file_url.url}}"   style="width:250px"/> -->
+
 
     {% endfor %}
+
   </div>
 
-  
+
   <div class="content-text">
     <p class="text-light">Log:</p>
     {% for log in object.log.all %}
@@ -430,7 +433,7 @@ table td:not(.except-css) {
       </tr>
     </tbody>
   </table>
-
+  {% if user.is_authenticated %}  Hello, {{ user.username }} {% endif %}
 
 </body>
 
