@@ -66,3 +66,5 @@ The following secret was added to django-vitejs:
 
 to remove
 react select
+
+### don't forget user fullname

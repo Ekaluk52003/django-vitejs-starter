@@ -166,7 +166,7 @@ if FILE_UPLOAD_STORAGE == "s3":
     AWS_DEFAULT_ACL = 'private'
     #The number of seconds that a generated URL is valid for
     # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#configuration-settings
-    AWS_QUERYSTRING_EXPIRE = 1800 # seconds
+    AWS_QUERYSTRING_EXPIRE = 5000 # seconds
 
 
 

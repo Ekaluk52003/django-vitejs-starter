@@ -134,7 +134,29 @@
   padding: 1rem 0;
   overflow-x: auto;
 }
-.resize-cursor {
+/* .resize-cursor {
   cursor: ew-resize;
   cursor: col-resize;
+} */
+
+/* .editor-image {
+  max-width: 30%;
+  height: auto;
+} */
+
+.ProseMirror figure {
+  margin: 0;
 }
+.ProseMirror figure img {
+
+  /* max-width: 300px; */
+
+  /* height: auto; */
+    /* due to taiwind style image with Blog by default */
+    width: 65%;
+  display: inline ;
+}
+.ProseMirror .ProseMirror-selectednode img {
+  outline: 3px solid blue;
+}
+

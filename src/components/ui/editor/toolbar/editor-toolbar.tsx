@@ -46,7 +46,10 @@ const EditorToolbar = ({ editor }: EditorToolbarProps) => {
           onPressedChange={() => {
             const url = window.prompt('URL')
             if (url) {
+
+
               editor.chain().focus().setImage({ src: url }).run()
+         
             }
           }}
           disabled={!editor.can().chain().focus().toggleBold().run()}
