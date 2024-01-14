@@ -30,28 +30,7 @@ export const removeFileAction = async({ params}) => {
   return null
 }
 
-// @ts-expect-error ignore //
-export async function uploadAction({ request }) {
 
-  const formData = await request.formData();
-
-  const file = formData.get("photo");
-  formData.append("file", file);
-
- try { await fetch('/api/v1/upload-note', {
-    method: "POST",
-    credentials: "same-origin",
-    headers: {
-      "X-CSRFToken": cookies.get("csrftoken"),
-    },
-    body:formData,
-
-})}
-catch(error) {
-  console.log(error)
-}
-return redirect("/");
-}
 
 // @ts-expect-error find out request later //
 export const loginAction = async({ request}) => {

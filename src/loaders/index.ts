@@ -1,13 +1,6 @@
 
 import { redirect} from "react-router-dom";
 
-// export const csrfLoader = async() => {
-//   const response = await fetch("/api/session/", {
-//     credentials: "same-origin",
-//   });
-//   return response.json();
-// }
-
 
 export const csrfLoader = async() => {
    await fetch("/api/v1/auth/csrf", {
@@ -63,23 +56,7 @@ return response.json();
 
 
 }
-// @ts-expect-error find out request later //
-export const paginationLoader = async ({request}) => {
 
-  const url = new URL(request.url);
-  const pageNumber = url.searchParams.get("page") || 1
-  const term = url.searchParams.get("term") || ""
-  const perpage = url.searchParams.get("perpage") || 3
-
-    const response = await fetch(`/api/v1/paginate-notes?page=${pageNumber}&term=${term}&perpage=${perpage}`, {
-      credentials: "same-origin",
-    });
-
-    const data = await response.json()
-
-  return { notes:data, page:parseInt(pageNumber as string), term:term, perpage:perpage}
-
-  }
 // @ts-expect-error ok //
   export const paginationEmemo = async ({request}) => {
 

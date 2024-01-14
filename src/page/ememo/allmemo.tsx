@@ -89,7 +89,7 @@ export default function Allmemo() {
         >
           Open cases assign to me
         </label>
-        <div><Link to="/dashboard/ememo/all">❌Clear Filter</Link></div>
+
       </div>
 
       {/* Above checkbox is {checked ? "checked" : "un-checked"}. */}

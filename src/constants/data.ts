@@ -9,46 +9,27 @@ export const navItems: NavItem[] = [
     icon: "billing",
     label: "Home",
   },
+
   {
-    title: "protect-route",
-    href: "/protect-route",
-    icon: "dashboard",
-    label: "Dashboard",
-  },
-  {
-    title: "All Memo",
+    title: "🗒️ All Memo",
     href: "/dashboard/ememo/all",
-    icon: "page",
+    //@ts-expect-error no icon
+    icon: "",
     label: "New memo",
   },
   {
-    title: "New Memo",
+    title: "✍️ New Memo",
     href: "/dashboard/ememo/new",
-    icon: "page",
+        //@ts-expect-error no icon
+    icon: "",
     label: "New memo",
   },
+
   {
-    title: "Employee",
-    href: "/dashboard/employee",
-    icon: "employee",
-    label: "employee",
-  },
-  {
-    title: "Profile",
+    title: "Profile 🚧 Underconstruction",
     href: "/dashboard/profile",
     icon: "profile",
-    label: "profile",
+    label: "profile 🚧 Underconstruction",
   },
-  {
-    title: "pagination",
-    href: "/pagination",
-    icon: "check",
-    label: "pagination",
-  },
-  {
-    title: "Login",
-    href: "/login",
-    icon: "login",
-    label: "login",
-  },
+
 ];

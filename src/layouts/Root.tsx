@@ -10,7 +10,7 @@ export default function Root() {
 
   const {pathname} = useLocation();
 
-  const noHeaderSidebarRoute = pathname.split('/')[1] == "login" ||  pathname.split('/')[1] == "forgot_password" || pathname.split('/')[1] == "password_reset"  || pathname.split('/')[1] == ""
+  const noHeaderSidebarRoute = pathname.split('/')[1] == "login" ||  pathname.split('/')[1] == "forgot_password" || pathname.split('/')[1] == "password_reset" 
 
 
 

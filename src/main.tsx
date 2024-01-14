@@ -5,14 +5,13 @@ import "./index.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./layouts/Root";
-import { csrfLoader, authLoader, paginationLoader, userSelectLoader, EmemoLoader, userLoader, redirectLogin, paginationEmemo } from "./loaders";
-import { logoutAction, loginAction, uploadAction, resetPasswordAction, ForgotPasswordAction,  createEmemoAction, editEmemoAction, removeFileAction } from "./actions/index.ts";
+import { csrfLoader, authLoader, userSelectLoader, EmemoLoader, userLoader, redirectLogin, paginationEmemo } from "./loaders";
+import { logoutAction, loginAction, resetPasswordAction, ForgotPasswordAction,  createEmemoAction, editEmemoAction, removeFileAction } from "./actions/index.ts";
 import Login from "./page/login";
-import ProtectPage from "./page/ProtectPage";
+
 import ForgotPassword from "./page/ForgotPassword.tsx";
 import PasswordReset from "./page/PasswordReset.tsx";
 import { Toaster } from "@/components/ui/toaster"
-import Pagination from "./page/Pagination.tsx";
 import Dashboard from "./page/Dashboard.tsx";
 import Submit from "./page/ememo/submit.tsx";
 import Detail from "./page/ememo/detail.tsx";
@@ -27,7 +26,9 @@ const router = createBrowserRouter([
     path: "/",
     element: <Root />,
     loader: csrfLoader,
+    errorElement:<Errorpage/>,
     id: "authloader",
+
     children: [
       {
         path: "/login",
@@ -35,15 +36,9 @@ const router = createBrowserRouter([
         loader:redirectLogin,
         element: <Login />,
       },
-      { index: true, element: <App /> },
-      {
-        path: "protect-route",
-        element: <ProtectPage />,
-        action:uploadAction,
+      { index: true,
         loader:authLoader,
-
-
-      },
+        element: <App /> },
       {
         path: "password_reset/:email/:token",
         element: <PasswordReset />,
@@ -54,12 +49,6 @@ const router = createBrowserRouter([
         path: "forgot_password",
         element: <ForgotPassword />,
         action:ForgotPasswordAction
-
-      },
-      {
-        path: "pagination",
-        element: <Pagination />,
-        loader: paginationLoader
 
       },
       {

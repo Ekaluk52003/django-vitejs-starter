@@ -1,8 +1,9 @@
 // import { Tiptap } from "@/components/Tiptap";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import { useState, useCallback } from "react";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
 import Step from "@/components/step";
-import { useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -58,6 +59,7 @@ import {
   FileText,
   ArrowBigRightDash,
   ArrowBigLeftDash,
+  Tags,
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import Editor from "@/components/ui/editor/editor";
@@ -90,6 +92,15 @@ const formSchema = z.object({
 type EmemoFormValues = z.infer<typeof formSchema>;
 
 export default function Detail() {
+  const [, setCopied] = useState(false);
+
+  const onCopy = useCallback(() => {
+    setCopied(true);
+    toast({
+      title: "Link Copie",
+    });
+  }, []);
+
   const [open, setOpen] = useState(false);
   const [open2, setOpen2] = useState(false);
   const inputRef = useRef(null);
@@ -196,11 +207,10 @@ export default function Detail() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-
-      <h2 className='text-3xl font-bold tracking-tight'>
-        Ememo {ememo.number}
-      </h2>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-3xl font-bold tracking-tight'>
+          Ememo {ememo.number}
+        </h2>
         <div>
           <FileText className='inline-flex w-3 h-3' />
           <a
@@ -210,8 +220,6 @@ export default function Detail() {
             Export PDF
           </a>
         </div>
-
-
       </div>
 
       <ShadForm {...form}>
@@ -238,8 +246,12 @@ export default function Detail() {
               <FormItem>
                 <FormLabel>Content</FormLabel>
                 <FormControl>
-               <Editor content={ememo.content} onChange={field.onChange} />
-                  {/* <Tiptap content={ememo.content} onChange={field.onChange} /> */}
+                  <Editor
+                    content={ememo.content}
+                    onChange={field.onChange}
+                    editable={ ememo.step == "Drafted"}
+                  />
+
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -438,8 +450,7 @@ export default function Detail() {
                     medias.map((media, id) => (
                       <div key={id} className='mt-2 mb-2'>
                         <div className='flex items-center space-y-1'>
-                     
-                          <FileText className='w-5 h-5' />
+
                           <a
                             href={`/api/v1/ememo/presigned_media/${media.filename}`}
                             className='text-sm font-medium leading-none'
@@ -458,6 +469,18 @@ export default function Detail() {
                           >
                             <Trash2 className='w-5 h-5' />
                           </button>
+                          <CopyToClipboard
+
+                            onCopy={onCopy}
+                            text={`http://127.0.0.1:8000/api/v1/ememo/presigned_media/${media.filename}`}
+                          >
+                            <button type='button'>
+                              <div className='flex align-baseline ml-2'>
+                                <Tags />
+                                <span className='text-xs self-center'>copy link</span>
+                              </div>
+                            </button>
+                          </CopyToClipboard>
                         </div>
                       </div>
                     ))}
@@ -491,7 +514,7 @@ export default function Detail() {
                           form.reset({
                             files: null,
                           });
-                          {/*// @ts-expect-error is ok */}
+                          { /*// @ts-expect-error is ok */ }
                           inputRef.current!.value = null;
                         }}
                       >

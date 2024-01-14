@@ -28,12 +28,8 @@ s3 = boto3.client('s3',
     )
 
 def url_fetcher(url):
-    if url.startswith(url):
-        if url.startswith('data'):
-               print('QR code')
-               url = url
-               weasyprint.default_url_fetcher(url)
-        else :
+        # image url start with below condition then request presign url
+        if url.startswith(f"{os.getenv('FRONTEND_URL')}/api/"):
              splitUrl = url.split("/")
              key =   splitUrl[7]
              bucket_name = os.getenv('AWS_STORAGE_BUCKET_NAME')
@@ -42,10 +38,10 @@ def url_fetcher(url):
                                                  Params={'Bucket': bucket_name,
                                                          'Key':  file_name},
                                                  ExpiresIn=3600)
-
              url =  response
 
-    return weasyprint.default_url_fetcher(url)
+             weasyprint.default_url_fetcher(url)
+        return  weasyprint.default_url_fetcher(url)
 
 
 

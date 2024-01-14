@@ -1,6 +1,6 @@
-import { Tiptap } from "@/components/Tiptap";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
+import Editor from "@/components/ui/editor/editor";
 import {
   Popover,
   PopoverContent,
@@ -150,7 +150,7 @@ export default function Submit() {
     <BreadCrumb items={breadcrumbItems} />
     <h2 className="text-3xl font-bold tracking-tight">
 
-Hi, Welcome back 👋
+New Memo
 </h2>
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -174,7 +174,7 @@ Hi, Welcome back 👋
             <FormItem>
               <FormLabel>Content</FormLabel>
               <FormControl>
-                <Tiptap content={''} onChange={field.onChange} />
+                <Editor content={''} onChange={field.onChange} editable={true}/>
               </FormControl>
               <FormMessage />
             </FormItem>

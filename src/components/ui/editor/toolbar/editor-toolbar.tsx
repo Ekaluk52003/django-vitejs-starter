@@ -44,12 +44,12 @@ const EditorToolbar = ({ editor }: EditorToolbarProps) => {
           className="mr-1"
           tooltip="Bold"
           onPressedChange={() => {
-            const url = window.prompt('URL')
+            const url = window.prompt('post image link from the file upload')
             if (url) {
 
 
               editor.chain().focus().setImage({ src: url }).run()
-         
+
             }
           }}
           disabled={!editor.can().chain().focus().toggleBold().run()}
