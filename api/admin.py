@@ -30,21 +30,21 @@ class CustomUserAdmin(UserAdmin):
         """
         return '/'.join([g.name for g in obj.groups.all()]) if obj.groups.count() else ''
 
-    list_display = ("email", "fullname",  "is_staff", "is_active","group_name")
+    list_display = ("email", "fullname",  "is_staff", "is_superuser","is_active","group_name")
     list_filter = ("email", "is_staff", "is_active")
     list_filter = UserAdmin.list_filter + (GroupListFilter,)
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         ('Profile',{'fields': ('fullname','jobtitle')}),
-        ("Permissions", {"fields": ("is_staff", "groups", "user_permissions")}),
+        ("Permissions", {"fields": ("is_staff", "is_superuser","groups", "user_permissions")}),
     )
     add_fieldsets = (
         (None, {
             "classes": ("wide",),
             "fields": (
                 "email", "password1", "password2", "jobtitle","fullname","is_staff",
-                "is_active", "groups", "user_permissions",
+                "is_active", "groups", "user_permissions", "is_staff", "is_superuser"
             )}
         ),
     )

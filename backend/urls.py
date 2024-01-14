@@ -13,6 +13,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # path('test/', include('api.urls')),
+    path('hijack/', include('hijack.urls')),
     path("api/v1/", api.urls),
     # path('password_reset/<uidb64>/<token>/', TemplateView.as_view(template_name="base.html"),
     #     name='password_reset_confirm')

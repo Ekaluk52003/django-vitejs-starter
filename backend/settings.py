@@ -27,6 +27,8 @@ INSTALLED_APPS = [
     'ememo',
     'django_fsm_log',
     'storages',
+    'hijack',
+    'hijack.contrib.admin'
 
 
 ]
@@ -43,6 +45,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'ninja_put_patch_file_upload_middleware.middlewares.process_put_patch',
+    'hijack.middleware.HijackUserMiddleware'
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -187,4 +190,4 @@ AWS_SES_SECRET_ACCESS_KEY = os.getenv('AWS_SES_SECRET_ACCESS_KEY')
 FRONTEND_URL=os.getenv("FRONTEND_URL", default="http://127.0.0.1:8000")
 
 
-
+HIJACK_PERMISSION_CHECK = "hijack.permissions.superusers_and_staff"
