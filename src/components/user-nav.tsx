@@ -51,16 +51,16 @@ export function UserNav() {
           <DropdownMenuGroup>
           {AuthUser.is_staff ?
             <DropdownMenuItem>
-             <a href="/admin/">Admin</a>
+             <a href="/admin/">Admin Page</a>
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>
             :""}
-            <DropdownMenuItem><Link to="/dashboard/profile">Profile</Link></DropdownMenuItem>
+            <DropdownMenuItem><Link to="/dashboard/profile">User Profile</Link>     <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut></DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem >
           <Form method='DELETE' action="/logout">
-                <button type='submit'>logout</button>
+                <button type='submit'>Logout from Account</button>
               </Form>
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>
