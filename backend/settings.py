@@ -191,3 +191,5 @@ FRONTEND_URL=os.getenv("FRONTEND_URL", default="http://127.0.0.1:8000")
 
 
 HIJACK_PERMISSION_CHECK = "hijack.permissions.superusers_and_staff"
+# Redirect User after Hjack
+LOGIN_REDIRECT_URL=os.getenv("FRONTEND_URL"+"/dashboard/profile", default="http://127.0.0.1:8000/dashboard/profile")

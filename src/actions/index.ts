@@ -103,6 +103,31 @@ export const ForgotPasswordAction = async({ request}) => {
 
 }
 
+// @ts-expect-error find out request later //
+export const changePasswordAction = async({ request}) => {
+
+  const formData = await request.formData();
+  const new_password1 =  formData.get('new_password1')
+  formData.append("new_password2",new_password1)
+
+  const  changePasswordForm = Object.fromEntries(formData);
+  const reponse = await fetch('/api/v1/auth/change_password', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": cookies.get("csrftoken"),
+      },
+      credentials: "same-origin",
+      body: JSON.stringify(changePasswordForm),
+    });
+  if(!reponse.ok) {
+
+    return { error :"something wrong"}
+  }
+  return  { message :"password update"}
+
+}
+
 // @ts-expect-error ignore //
 export const createEmemoAction = async({ request}) => {
 

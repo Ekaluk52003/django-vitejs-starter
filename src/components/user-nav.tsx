@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,6 +18,7 @@ import { IMAGES } from "@/images/Images";
 export function UserNav() {
 
   const AuthUser = useRouteLoaderData("authloader");
+
 
   if (AuthUser) {
     return (
@@ -48,11 +49,13 @@ export function UserNav() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
+          {AuthUser.is_staff ?
             <DropdownMenuItem>
-              Profile
+             <a href="/admin/">Admin</a>
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>
-            <DropdownMenuItem>New Team</DropdownMenuItem>
+            :""}
+            <DropdownMenuItem><Link to="/dashboard/profile">Profile</Link></DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem >

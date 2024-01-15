@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./layouts/Root";
 import { csrfLoader, authLoader, userSelectLoader, EmemoLoader, userLoader, redirectLogin, paginationEmemo } from "./loaders";
-import { logoutAction, loginAction, resetPasswordAction, ForgotPasswordAction,  createEmemoAction, editEmemoAction, removeFileAction } from "./actions/index.ts";
+import { logoutAction, loginAction, resetPasswordAction, ForgotPasswordAction,  createEmemoAction, editEmemoAction, removeFileAction, changePasswordAction } from "./actions/index.ts";
 import Login from "./page/login";
 
 import ForgotPassword from "./page/ForgotPassword.tsx";
@@ -17,6 +17,7 @@ import Submit from "./page/ememo/submit.tsx";
 import Detail from "./page/ememo/detail.tsx";
 import Errorpage from "./components/error-page.tsx";
 import Allmemo from "./page/ememo/allmemo.tsx";
+import Profile from "./page/Profile.tsx";
 
 
 
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
       { index: true,
         loader:authLoader,
         element: <App /> },
+
       {
         path: "password_reset/:email/:token",
         element: <PasswordReset />,
@@ -63,6 +65,11 @@ const router = createBrowserRouter([
             loader:paginationEmemo
           },
           {
+            path: "/dashboard/profile",
+            action:changePasswordAction,
+            loader:authLoader,
+            element: <Profile/> },
+          {
             path: "/dashboard/ememo/new",
             element: <Submit />,
             action: createEmemoAction,
@@ -75,7 +82,7 @@ const router = createBrowserRouter([
             loader:EmemoLoader,
             errorElement:<Errorpage/>
 
-          }
+          },
 
         ]
 

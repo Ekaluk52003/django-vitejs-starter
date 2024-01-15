@@ -26,7 +26,7 @@ export const navItems: NavItem[] = [
   },
 
   {
-    title: "Profile 🚧 Underconstruction",
+    title: "Profile",
     href: "/dashboard/profile",
     icon: "profile",
     label: "profile 🚧 Underconstruction",

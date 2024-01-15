@@ -1,7 +1,12 @@
 import { Link, Form, useActionData, useNavigation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 
 export default function Login() {
   const data = useActionData();
@@ -77,10 +82,15 @@ export default function Login() {
                 </Button>
               )}
             </Form>
-            {/*
-// @ts-ignore */}
+            {/*@ts-expect-error ok to error */}
             {data && data.error && (
-              <h5 className='text-lg text-red-700'>sss</h5>
+              <Alert variant="destructive">
+              <ExclamationTriangleIcon className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>
+               Make sure user email and password is correct
+              </AlertDescription>
+            </Alert>
             )}
             <p className='px-8 text-center text-sm text-muted-foreground'>
               <Link
