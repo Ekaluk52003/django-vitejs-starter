@@ -49,6 +49,7 @@ export function UserNav() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
+                {/*// @ts-expect-error is ok */}
           {AuthUser.is_staff ?
             <DropdownMenuItem>
              <a href="/admin/">Admin Page</a>

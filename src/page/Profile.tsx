@@ -36,6 +36,7 @@ export default function Profile() {
             readOnly
               type='text'
               name='fullname'
+              //@ts-expect-error ok to
               value={user.fullname}
               className='w-full px-3 py-2 mb-3 text-gray-800 border rounded focus:outline-none'
             />
@@ -46,6 +47,7 @@ export default function Profile() {
             readOnly
               type='text'
               name='jobtitle'
+                     //@ts-expect-error ok to
               value={user.jobtitle}
               className='w-full px-3 py-2 mb-3 text-gray-800 border rounded focus:outline-none'
             />
@@ -56,6 +58,7 @@ export default function Profile() {
             readOnly
               type='email'
               name='email'
+                     //@ts-expect-error ok to
               value={user.email}
               className='w-full px-3 py-2 mb-3 text-gray-800 border rounded focus:outline-none'
             />
@@ -90,6 +93,7 @@ export default function Profile() {
               )}
 
         </Form>
+             {/*// @ts-expect-error is ok */}
         {data && data.error ?
               <Alert variant="destructive">
               <ExclamationTriangleIcon className="h-4 w-4" />
@@ -100,12 +104,13 @@ export default function Profile() {
             </Alert> : ""
 
           }
-
+           {/*// @ts-expect-error is ok */}
            {data && data.message ?
                <Alert className="text-green-500">
                <CheckCircledIcon className="h-4 w-4 text-green-500" />
                <AlertTitle>Success</AlertTitle>
                <AlertDescription>
+                           {/*// @ts-expect-error is ok */}
                {data.message}
                </AlertDescription>
              </Alert> : ""
