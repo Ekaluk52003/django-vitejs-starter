@@ -8,7 +8,7 @@ This template provides a minimal setup to get React working in Vite with HMR and
 $ git clone https://github.com/Ekaluk52003/django-vitejs-starter.git
 $ py -m venv myenv
 $ myenv\Scripts\activate
-$ py install -r requirements.txt
+$ pip install -r requirements.txt
  py manage.py runserver
 
 ### To start React-vite
