@@ -158,7 +158,6 @@ if  FILE_UPLOAD_STORAGE == "local":
 
 if FILE_UPLOAD_STORAGE == "s3":
 
-
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'uploads/'
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
