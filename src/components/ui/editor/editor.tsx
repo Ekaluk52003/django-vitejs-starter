@@ -14,7 +14,7 @@ import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 
 import { MyImage } from "./extension/image";
-
+import { useEffect } from 'react'
 
 
 interface EditorProps {
@@ -30,7 +30,6 @@ const Editor = ({ content, placeholder, onChange, editable }: EditorProps) => {
 
 
   const editor = useEditor({
-    editable:  editable,
     extensions: [
       StarterKit,
       TextAlign.configure({ types: ["heading", "paragraph", "image"] }),
@@ -66,11 +65,24 @@ const Editor = ({ content, placeholder, onChange, editable }: EditorProps) => {
       onChange(editor.getHTML());
     },
   });
+  useEffect(() => {
+    if (!editor) {
+      return undefined
+    }
+    if(!editable ) {
+      editor.setEditable(false)
+    }
 
-  if (!editor) return <></>;
+    editor.setEditable(editable)
+  }, [editor, editable])
+
+  if (!editor) {
+    return null
+  }
 
   return (
     <div className='prose max-w-none w-full border border-input bg-background dark:prose-invert'>
+
 
       { editable ?   <EditorToolbar editor={editor} /> : ""}
 

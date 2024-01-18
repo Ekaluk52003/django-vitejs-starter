@@ -6,9 +6,37 @@ from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 import qrcode
 import io
+import os
 import base64
 from django.shortcuts import get_object_or_404
 from weasyprint import HTML,  CSS
+import weasyprint
+import boto3
+
+s3 = boto3.client('s3',
+        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+    )
+
+
+
+def url_fetcher(url):
+        # image url start with below condition then request presign url
+        if url.startswith(f"{os.getenv('FRONTEND_URL')}/api/"):
+             splitUrl = url.split("/")
+             key =   splitUrl[7]
+             bucket_name = os.getenv('AWS_STORAGE_BUCKET_NAME')
+             file_name = 'files/ememo/'+key
+             response = s3.generate_presigned_url('get_object',
+                                                 Params={'Bucket': bucket_name,
+                                                         'Key':  file_name},
+                                                 ExpiresIn=3600)
+             url =  response
+
+             weasyprint.default_url_fetcher(url)
+        return  weasyprint.default_url_fetcher(url)
+
+
 
 @receiver(pre_save, sender=Ememo)
 def change_step(sender, instance, **kwargs):
@@ -24,7 +52,7 @@ def change_step(sender, instance, **kwargs):
         cc = flow.cc or None
         EmailContent = flow.contentEmail or None
         link = settings.FRONTEND_URL+'/dashboard/ememo/'+str(instance.number)
-        html_content = render_to_string('email/ememo_email.html',  {'object': instance, 'EmailContent': EmailContent, 'link':link })
+        html_content = render_to_string('ememo/Emails/ememo_email.html',  {'object': instance, 'EmailContent': EmailContent, 'link':link })
         msg = EmailMultiAlternatives(f'Ememo {instance.number} {instance.step} ', 'email plain content', 'ekaluk.pong@yahoo.com',[to], cc)
         msg.attach_alternative(html_content, "text/html")
         if flow.sendPDF:
@@ -38,8 +66,8 @@ def change_step(sender, instance, **kwargs):
             qr_code_image.save(buffer, format="PNG")
             qr_code_image_data = base64.b64encode(buffer.getvalue()).decode()
             object = get_object_or_404(Ememo, number=instance.number )
-            rendered  = render_to_string('ememo/ememo_report.html',  {'object':object, 'qr_code_image_data': qr_code_image_data })
-            html = HTML(string=rendered, base_url=None)
+            rendered  = render_to_string('ememo/PDF/ememo_report.html',  {'object':object, 'qr_code_image_data': qr_code_image_data })
+            html = HTML(string=rendered, base_url=None, url_fetcher=url_fetcher)
             pdFile =  html.write_pdf()
             msg.attach(f'ememo_{instance.number}.pdf', pdFile, 'application/pdf')
         return msg.send()

@@ -239,12 +239,13 @@ export default function Detail() {
               )}
             />
           </div>
+
           <FormField
             control={form.control}
             name='content'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Content</FormLabel>
+                <FormLabel>Content </FormLabel>
                 <FormControl>
                   <Editor
                     content={ememo.content}
@@ -600,7 +601,7 @@ export default function Detail() {
       </ShadForm>
 
       <div className='flex justify-between mt-4'>
-        {CanReject && (
+        {CanReject &&  (
           <AlertDialog open={open2} onOpenChange={setOpen2}>
             <AlertDialogTrigger className='secondary'>
               <ArrowBigLeftDash className='inline-flex text-red-500 self-baseline' />
@@ -643,8 +644,8 @@ export default function Detail() {
         {Authorize && (
           <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger className='secondary'>
-              {" "}
-              Process Next
+              {ememo.step == "Reject"? "Resubmit": "Process Next"}
+
               <ArrowBigRightDash className='inline-flex self-baseline' />
             </AlertDialogTrigger>
             <AlertDialogContent>
