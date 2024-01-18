@@ -59,7 +59,6 @@ def change_step(sender, instance, **kwargs):
             print("sennding email with pdf")
             qr = qrcode.QRCode(version=1,error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=2,border=1)
             qr.add_data(settings.FRONTEND_URL+'/dashboard/ememo/'+str(instance.number))
-
             qr.make(fit=True)
             qr_code_image = qr.make_image(fill_color="black", back_color="white").convert('RGB')
             buffer = io.BytesIO()
@@ -67,7 +66,13 @@ def change_step(sender, instance, **kwargs):
             qr_code_image_data = base64.b64encode(buffer.getvalue()).decode()
             object = get_object_or_404(Ememo, number=instance.number )
             rendered  = render_to_string('ememo/PDF/ememo_report.html',  {'object':object, 'qr_code_image_data': qr_code_image_data })
-            html = HTML(string=rendered, base_url=None, url_fetcher=url_fetcher)
+
+            # base_url = "http://127.0.0.1:8000"
+            # The base used to resolve relative URLs (e.g. in <img src="../foo.png">).
+
+            base_url = os.getenv("FRONTEND_URL")
+            html = HTML(string=rendered, base_url=base_url, url_fetcher=url_fetcher)
+            
             pdFile =  html.write_pdf()
             msg.attach(f'ememo_{instance.number}.pdf', pdFile, 'application/pdf')
         return msg.send()

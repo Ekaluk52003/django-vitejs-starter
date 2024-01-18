@@ -49,15 +49,14 @@ def url_fetcher(url):
 def create_pdf(request,  pk: int):
 
      qr = qrcode.QRCode(version=1,error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=2,border=1)
-     qr.add_data("https://www.sanook.com/campus/1404076/")
+
+     qr.add_data(settings.FRONTEND_URL+'/dashboard/ememo/'+str(pk))
      qr.make(fit=True)
      qr_code_image = qr.make_image(fill_color="black", back_color="white").convert('RGB')
             # Create a BytesIO buffer to temporarily store the image
      buffer = io.BytesIO()
      qr_code_image.save(buffer, format="PNG")
      qr_code_image_data = base64.b64encode(buffer.getvalue()).decode()
-
-
      object = get_object_or_404(Ememo, number=pk )
      rendered  = render_to_string('ememo/PDF/ememo_report.html',  {'request':request, 'object':object, 'qr_code_image_data': qr_code_image_data})
      html = HTML(string=rendered, base_url=request.build_absolute_uri("/"), url_fetcher=url_fetcher)
