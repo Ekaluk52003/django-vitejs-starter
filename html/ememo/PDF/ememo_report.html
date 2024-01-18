@@ -1,0 +1,443 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+     <style>
+
+
+      body {
+        font-size: 16px;
+         font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+        line-height: 1.75rem;
+      }
+
+       img {
+        width: 80%;
+       }
+
+       .tt-indent-1 {
+        text-indent: 3rem;
+      }
+      .tt-indent-2 {
+        text-indent: 6rem;
+      }
+      .tt-indent-3 {
+        text-indent: 9rem;
+      }
+
+     /* This is a single-line comment */
+     table {
+      border-collapse: collapse;
+      margin: 0;
+      overflow: hidden;
+      table-layout: fixed;
+      width: 100%;
+  }
+
+
+      table th:not(.except-css) {
+      font-weight: bold;
+      text-align: left;
+
+  }
+
+   table th:not(.except-css) {
+
+    border: 1px solid #010911;
+    box-sizing: border-box;
+    min-width: 1em;
+    padding: 3px 5px;
+    position: relative;
+    vertical-align: top;
+    z-index: 1;
+}
+
+table td:not(.except-css) {
+
+  border: 1px solid #010911;
+  box-sizing: border-box;
+  min-width: 1em;
+  padding: 3px 5px;
+  position: relative;
+  vertical-align: top;
+  z-index: 1;
+}
+     /* end table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      table tr td {
+        padding: 0;
+      }
+
+
+
+      .alight-right {
+        text-align: right;
+      }
+
+      .bold {
+        font-weight: bold;
+      }
+
+      .right {
+        text-align: right;
+      }
+
+      .large {
+        font-size: 1em;
+      }
+
+      .total {
+        font-weight: bold;
+
+      }
+
+      .logo-container {
+        margin: 0px 0 0px 0;
+        position: absolute;
+        left: -0.25rem;
+        top:-2rem;
+      }
+
+      .invoice-info-container {
+        font-size: 0.875em;
+        line-height: 0.875rem;
+      }
+      .invoice-info-container td {
+        padding: 4px 0;
+      }
+
+      .client-name {
+        font-size: 1.5em;
+        vertical-align: top;
+      }
+
+      .heading {
+        margin-top:-1rem;
+        font-size: 1.25em;
+        font-weight: bold;
+      }
+
+      .paragraph-content {
+        margin-top:-0.75rem;
+        font-size: 1em;
+
+      }
+
+      .line-items-container {
+        margin: 70px 0;
+        font-size: 0.875em;
+      }
+
+      .line-items-container th {
+        text-align: left;
+        color: #999;
+        font-size: 1em;
+        text-transform: uppercase;
+      }
+
+      .text-light {
+        color: #999;
+        font-size: 0.75em;
+        text-transform: uppercase;
+      }
+
+      .text-comment {
+        color: #999;
+        padding:0;
+        font-size: 0.75em;
+        text-transform: uppercase;
+      }
+
+
+      .line-items-container th:last-child {
+        text-align: right;
+      }
+
+      .line-items-container td {
+        padding: 15px 0;
+      }
+
+      .line-items-container tbody tr:first-child td {
+        padding-top: 5px;
+      }
+
+      .line-items-container.has-bottom-border tbody tr:last-child td {
+        padding-bottom: 25px;
+        border-bottom: 2px solid #ddd;
+      }
+
+      .line-items-container.has-bottom-border {
+        margin-bottom: 0;
+      }
+
+      .line-items-container th.heading-quantity {
+        width: 50px;
+      }
+      .line-items-container th.heading-price {
+        text-align: right;
+        width: 100px;
+      }
+      .line-items-container th.heading-subtotal {
+        width: 100px;
+      }
+
+      .payment-info {
+        width: 38%;
+        line-height: 1.5;
+      }
+
+      .btm-info span img {
+        display: inline-block;
+        position: relative;
+        top: 1px;
+        width: 25px;
+        margin-right: 4px;
+      }
+
+       .btm-info {
+        float: right;
+        margin-top: -5px;
+
+        font-size: 1em;
+        color: #ccc;
+      }
+      .btm-info span {
+        padding: 0 5px;
+        color: black;
+      }
+
+      .footer-info span:last-child {
+        padding-right: 0;
+      }
+
+      .page-container {
+        display: none;
+      }
+
+      .btm-container {
+        display: none;
+      }
+
+
+
+
+.page-container {
+  display: block;
+  position: running(pageContainer);
+  margin-top: -25px;
+  font-size: 12px;
+  text-align: right;
+  color: #999;
+}
+
+.btm-container {
+  display: block;
+  position: running(footContainer);
+  margin-top: -25px;
+  font-size: 12px;
+  text-align: right;
+  color: #999;
+}
+
+
+
+.content-text {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding: 1px 1px;
+}
+
+.page-container .page::after {
+  content: counter(page);
+}
+
+.page-container .pages::after {
+  content: counter(pages);
+}
+.log {
+  line-height: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+.watermark{
+	-webkit-transform: rotate(331deg);
+	-moz-transform: rotate(331deg);
+	-o-transform: rotate(331deg);
+	transform: rotate(331deg);
+	font-size: 7em;
+	color: rgba(255, 5, 5, 0.17);
+	position: absolute;
+  margin-top:60rem;
+
+	text-transform:uppercase;
+  position: running(watermark);
+
+}
+
+@page {
+  size: a4 portrait;
+  margin-top: 20mm;
+  margin-bottom: 20mm;
+  margin-right:20mm;
+  margin-left:25mm;
+
+  @bottom-right {
+    content: element(pageContainer);
+  }
+  @bottom-left {
+    content: element(footContainer);
+  }
+
+  @top-center {
+
+    content: element(watermark);
+
+  }
+
+
+}
+    </style>
+ <head>
+
+  <title>Report</title>
+
+</head>
+
+
+<body>
+  <div class="page-container">
+    Page
+    <span class="page"></span>
+    of
+    <span class="pages"></span>
+  </div>
+
+  <div class="btm-container">
+    <div class="btm-info"><span> <img src="data:image/png;base64,{{ qr_code_image_data }}" alt="QR Code">Link to the document</span> |
+      <span>hello@useanvil.com</span> |
+      <span>555 444 6666</span> |
+      <span>useanvil.com</span></div>
+  </div>
+
+  <div class="logo-container">
+
+    <!-- D:\Django\django-vitejs\public file here-->
+    <img
+      style="width:90px"
+      src="{% static '/logo2.jpg' %}"
+    >
+
+
+  </div>
+
+  {% if object.step == "DONE" %}
+  <p class="watermark">Approved</p>
+  {% else %}
+  <p class="watermark">Pending</p>
+  {% endif %}
+  <table class="invoice-info-container">
+    <tr class="except-css">
+      <td rowspan="2" class="client-name except-css">
+      </td>
+      <td class="except-css alight-right">
+        Anvil Co
+      </td>
+    </tr>
+    <tr class="except-css">
+      <td class="except-css alight-right">
+        123 Main Street
+      </td>
+    </tr>
+    <tr class="except-css">
+      <td class="except-css">
+
+      </td>
+      <td class="except-css alight-right">
+        San Francisco CA, 94103
+      </td>
+    </tr>
+    <tr class="except-css">
+      <td class="except-css">
+        Ememo No: <strong>{{object.number }}</strong>
+      </td>
+      <td class="except-css alight-right">
+        hello@useanvil.com
+      </td>
+    </tr>
+  </table>
+  <div class="content-text">
+
+    <p class="text-light">Title:</p> <h3 class="heading"> {{ object.title }}</h3>
+    <p class="text-light">Content:</p> <p class="paragraph-content">{{ object.content |safe  }}</p>
+  </div>
+
+  <div class="content-text">
+    <p class="text-light">File:</p>
+    {% for media in object.media.all %}
+    <p class="paragraph-content">{{ media.filename}}</p>
+    <!-- <img src="{{ media.file_url.url}}"   style="width:250px"/> -->
+
+
+    {% endfor %}
+
+  </div>
+
+
+  <div class="content-text">
+    <p class="text-light">Log:</p>
+    {% for log in object.log.all %}
+    <div class="log">
+      <p class="">{{ log.description}}</p>
+      <p class="">comment :{{ log.comment }}</p>
+      <p class="">Name :  {{log.logBy.fullname}}</p>
+
+    </div>
+
+    {% endfor %}
+  </div>
+
+
+  <table class="line-items-container">
+    <thead>
+      <tr>
+        <th class="except-css">Aprrove by</th>
+        <th class="except-css">Approved Date</th>
+        <th class="except-css">Final status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="payment-info except-css">
+          <div>
+
+            Approver By : <strong>{{ object.approver.fullname}}</strong>
+
+          </div>
+          <div>
+            Reviewver By : <strong>{{ object.reviewer.fullname}}</strong>
+          </div>
+        </td>
+        <td class="large except-css">{{ object.updated_at}}</td>
+        <td class="large total except-css alight-right">{{ object.step}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+</body>
+
+</html>
+
+
+
