@@ -10,6 +10,7 @@ export default function Errorpage() {
 
   const error = useRouteError();
   if (isRouteErrorResponse(error)) {
+   
     return (
 <div className="flex items-center justify-center h-screen">
   <div className="text-center">

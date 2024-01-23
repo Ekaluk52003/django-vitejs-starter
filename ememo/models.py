@@ -10,6 +10,7 @@ Step = (
            ("Reject", "Reject"),
             ("Cancel", "Cancel"),
           ("PRE_APPROVE", "PRE_APPROVE"),
+          ("PRE_FINAL", "PRE_FINAL"),
           ("FINAL_APPROVE", "FINAL_APPROVE"),
           ("DONE", "DONE"),
                ("Any", "Any"),
@@ -22,6 +23,7 @@ class Ememo(models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     reviewer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reviewer', null=True, blank=True)
     approver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='approver', null=True, blank=True)
+    final_approver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='final_approver', null=True, blank=True)
     assignnee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='assignnee', null=True, blank=True)
     step =  models.CharField(max_length=13, choices=Step, default='Drafted')
     created_at = models.DateTimeField(auto_now_add=True)

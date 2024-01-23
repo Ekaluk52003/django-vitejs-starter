@@ -85,6 +85,9 @@ const formSchema = z.object({
   approver_id: z.string({
     required_error: "Please select a approver.",
   }),
+  final_approver_id: z.string({
+    required_error: "Please select a final approver.",
+  }),
 
   files: z.any(),
 });
@@ -137,6 +140,7 @@ export default function Detail() {
     title: ememo.title,
     content: ememo.content,
     approver_id: ememo.approver.id.toString(),
+    final_approver_id: ememo.final_approver.id.toString(),
     reviewer_id: ememo.reviewer.id.toString(),
 
     // files: new File([], "")
@@ -216,6 +220,7 @@ export default function Detail() {
           <a
             href={`/api/v1/pdf/report/${ememo.number}`}
             className='text-sm leading-none'
+            target="_blank" rel="noopener noreferrer"
           >
             Export PDF
           </a>
@@ -250,7 +255,7 @@ export default function Detail() {
                   <Editor
                     content={ememo.content}
                     onChange={field.onChange}
-                    editable={ ememo.step == "Drafted"}
+                    editable={ ememo.step == "Drafted" && Authorize}
                   />
 
                 </FormControl>
@@ -400,6 +405,70 @@ export default function Detail() {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name='final_approver_id'
+                      render={({ field }) => (
+                        <FormItem className='flex flex-col my-6'>
+                          <FormLabel>Final Approver</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant='outline'
+                                  role='combobox'
+                                  className={cn(
+                                    "w-[200px] justify-between",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value
+                                    ? users.find(
+                                        // @ts-expect-error is ok
+                                        (user) => user.value === field.value
+                                      )?.label
+                                    : "Select user"}
+                                  <CaretSortIcon className='w-4 h-4 ml-2 opacity-50 shrink-0' />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-[200px] p-0'>
+                              <Command>
+                                <CommandInput placeholder='Search language...' />
+                                <CommandEmpty>No User found.</CommandEmpty>
+                                <CommandGroup>
+                                  {/*// @ts-expect-error is ok */}
+                                  {users.map((user) => (
+                                    <CommandItem
+                                      value={user.label}
+                                      key={user.value}
+                                      onSelect={() => {
+                                        form.setValue(
+                                          "final_approver_id",
+                                          user.value
+                                        );
+                                      }}
+                                    >
+                                      <CheckIcon
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          user.value === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {user.label}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </CardContent>
                 </CardHeader>
               </Card>
@@ -455,6 +524,7 @@ export default function Detail() {
                           <a
                             href={`/api/v1/ememo/presigned_media/${media.filename}`}
                             className='text-sm font-medium leading-none'
+                            target="_blank" rel="noopener noreferrer"
                           >
                             {media.filename}
                           </a>

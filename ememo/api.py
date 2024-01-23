@@ -18,14 +18,6 @@ import os
 from django.http import HttpResponse
 
 
-# class EmemoSchema(ModelSchema):
-#     class Config:
-#         model = Ememo
-#         model_fields = "__all__"
-#         # model_exclude = ['assignnee','file','author', 'id', 'created_at', 'updated_at']
-#         model_exclude = ['assignnee', 'author',
-#                          'number' 'created_at', 'updated_at']
-
 
 class EmemoIn(Schema):
     title: str
@@ -49,6 +41,7 @@ class EmemoSchemaIn(Schema):
     content: str
     reviewer_id:  str = None
     approver_id:   str = None
+    final_approver_id :   str = None
     # reviewer:  UserSchema = None
 
 
@@ -60,6 +53,7 @@ class EmemoOut(Schema):
     author:  UserSchema = None
     reviewer:  UserSchema = None
     approver:  UserSchema = None
+    final_approver:  UserSchema = None
     assignnee:  UserSchema = None
     step: str
     created_at: datetime
@@ -130,8 +124,10 @@ def approve(request, payload: Comment, ememo_id: int):
         ememo.assignnee = ememo.author
     if flow.target == "PRE_APPROVE":
         ememo.assignnee = ememo.reviewer
+    if flow.target == "PRE_FINAL":
+       ememo.assignnee = ememo.approver
     if flow.target == "FINAL_APPROVE":
-        ememo.assignnee = ememo.approver
+        ememo.assignnee = ememo.final_approver
     if flow.target == "DONE":
         ememo.assignnee = None
     ememo.save()
@@ -151,6 +147,7 @@ def reject(request, payload: Comment, ememo_id: int):
     ememo = get_object_or_404(Ememo, number=ememo_id)
 
     if request.auth.id != ememo.assignnee_id and request.auth.id != ememo.author_id:
+    # if request.auth.id != ememo.assignnee_id or request.auth.id != ememo.author_id:
         return 401, {'message': 'You are not authorize'}
     try:
         flow = FlowEmemo.objects.get(source=ememo.step)
@@ -195,7 +192,7 @@ def create_ememo(request, data: EmemoSchemaIn = Form(...), files: List[UploadedF
 
     run_number = Runnumber.objects.filter(form_name="ememo").get()
     ememo_created = Ememo.objects.create(title=data.title, content=data.content,  reviewer_id=data.reviewer_id, number=run_number.running_number,
-                                         approver_id=data.approver_id, assignnee_id=request.auth.id, author_id=request.auth.id)
+                                         final_approver_id=data.final_approver_id, approver_id=data.approver_id,assignnee_id=request.auth.id, author_id=request.auth.id)
 
     run_number.running_number = run_number.running_number + 1
     run_number.save()
@@ -211,15 +208,15 @@ def create_ememo(request, data: EmemoSchemaIn = Form(...), files: List[UploadedF
 def getEmemo(request, ememo_id: int):
     try:
         ememo = Ememo.objects.select_related(
-            'author', 'reviewer', 'approver', 'assignnee').get(number=ememo_id)
+            'author', 'reviewer', 'approver', 'final_approver','assignnee').get(number=ememo_id)
 
     except Ememo.DoesNotExist as e:
         return 404, {'message': 'Could not find ememo'}
 
-    if request.user.groups.filter(name="Manager").exists():
+    if request.user.groups.filter(name="Ememo_Manager").exists():
         return 200, ememo
 
-    if request.auth != ememo.assignnee and request.auth != ememo.author and request.auth != ememo.reviewer and request.auth != ememo.approver:
+    if request.auth != ememo.assignnee and request.auth != ememo.author and request.auth != ememo.reviewer and request.auth != ememo.approver and request.auth != ememo.final_approver:
         return 401, {'message': 'Unauthorized'}
     return 200, ememo
 
@@ -300,6 +297,7 @@ def update_ememo(request, ememo_id: int,  form: EmemoSchemaIn = Form(...), files
     ememo_update.content = form.content
     ememo_update.reviewer_id = form.reviewer_id
     ememo_update.approver_id = form.approver_id
+    ememo_update.final_approver_id = form.final_approver_id
 
     if files is not None:
         for file in files:
@@ -336,8 +334,8 @@ def allmemo(request, perpage: int = 2, term='', me="me", page: int = 1):
             i for i in page_object.object_list.select_related('author', 'assignnee')]
         return response
 #  manager = request.user.groups.filter(name="Manager").exists()
-    elif request.user.groups.filter(name="Manager").exists():
-        print('true manager')
+    elif request.user.groups.filter(name="Ememo_Manager").exists():
+        print('true Ememo_Manager')
         ememos = Ememo.objects.filter(Q(content__icontains="try once more") | Q(
             title__icontains=term)).order_by('-created_at')
         paginator = Paginator(ememos, perpage)
@@ -356,7 +354,7 @@ def allmemo(request, perpage: int = 2, term='', me="me", page: int = 1):
     else:
         print('true else')
         ememos = Ememo.objects.filter(Q(content__icontains=term) | Q(title__icontains=term), Q(assignnee_id=request.auth.id) | Q(
-            reviewer_id=request.auth.id) | Q(approver_id=request.auth.id) | Q(author_id=request.auth.id)).order_by('-created_at')
+            reviewer_id=request.auth.id) | Q(approver_id=request.auth.id)| Q(final_approver_id=request.auth.id) | Q(author_id=request.auth.id)).order_by('-created_at')
         paginator = Paginator(ememos, perpage)
         page_number = page
         page_object = paginator.get_page(page_number)

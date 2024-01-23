@@ -39,6 +39,7 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/jpg",
   "image/png",
   "image/webp",
+  "application/pdf",
 ];
 
 const formSchema = z.object({
@@ -53,6 +54,9 @@ const formSchema = z.object({
   }),
   approver_id: z.string({
     required_error: "Please select a approver.",
+  }),
+  final_approver_id: z.string({
+    required_error: "Please select a final approver.",
   }),
 
   files: z
@@ -77,6 +81,7 @@ export default function Submit() {
     content: "",
     approver_id: undefined,
     reviewer_id: undefined,
+    final_approver_id: undefined,
     // files: new File([], "")
   };
 
@@ -180,6 +185,7 @@ New Memo
             </FormItem>
           )}
         />
+        <div className="py-4 space-y-6">
         <FormField
           control={form.control}
           name='reviewer_id'
@@ -300,6 +306,67 @@ New Memo
             </FormItem>
           )}
         />
+          <FormField
+          control={form.control}
+          name='final_approver_id'
+          render={({ field }) => (
+            <FormItem className='flex flex-col'>
+              <FormLabel>Final Approver</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant='outline'
+                      role='combobox'
+                      className={cn(
+                        "w-[200px] justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value
+                               // @ts-expect-error is ok
+                        ? users.find((user) => user.value === field.value)
+                            ?.label
+                        : "Select user"}
+                      <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className='w-[200px] p-0'>
+                  <Command>
+                    <CommandInput placeholder='Search language...' />
+                    <CommandEmpty>No User found.</CommandEmpty>
+                    <CommandGroup>
+                               {/*// @ts-expect-error is ok */}
+                      {users.map((user) => (
+                        <CommandItem
+                          value={user.label}
+                          key={user.value}
+                          onSelect={() => {
+                            form.setValue("final_approver_id", user.value);
+                          }}
+                        >
+                          <CheckIcon
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              user.value === field.value
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          {user.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        </div>
         <FormField
           control={form.control}
           name='files'
