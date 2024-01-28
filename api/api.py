@@ -101,7 +101,9 @@ def request_password_reset(request, data: RequestPasswordResetIn):
 					}
                text_content = plaintext.render(c)
                html_content = htmltemp.render(c)
-               msg = EmailMultiAlternatives(subject, text_content, 'Website <ekaluk.pong@yahoo.com>', [user.email], headers = {'Reply-To': 'admin@example.com'})
+               msg = EmailMultiAlternatives(subject, text_content, f'Ememo <{settings.DEFAULT_FROM_EMAIL}>', [user.email],
+            #    you must add hearders 'Reply-To': settings.DEFAULT_FROM_EMAIL} to make it work
+               headers = {'Reply-To': settings.DEFAULT_FROM_EMAIL})
                msg.attach_alternative(html_content, "text/html")
                msg.send()
 

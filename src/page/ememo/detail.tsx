@@ -543,7 +543,7 @@ export default function Detail() {
                           <CopyToClipboard
 
                             onCopy={onCopy}
-                            text={`${import.meta.env.VITE_FRONTEND_URL}/api/v1/ememo/presigned_media/${media.filename}`}
+                            text={`https://django-ememo.fly.dev/api/v1/ememo/presigned_media/${media.filename}`}
                           >
                             <button type='button'>
                               <div className='flex align-baseline ml-2'>

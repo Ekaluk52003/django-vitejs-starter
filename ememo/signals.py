@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from weasyprint import HTML,  CSS
 import weasyprint
 import boto3
+from django.conf import settings
 
 s3 = boto3.client('s3',
         aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
@@ -53,7 +54,7 @@ def change_step(sender, instance, **kwargs):
         EmailContent = flow.contentEmail or None
         link = settings.FRONTEND_URL+'/dashboard/ememo/'+str(instance.number)
         html_content = render_to_string('ememo/Emails/ememo_email.html',  {'object': instance, 'EmailContent': EmailContent, 'link':link })
-        msg = EmailMultiAlternatives(f'Ememo {instance.number} {instance.step} ', 'email plain content', 'ekaluk.pong@yahoo.com',[to], cc)
+        msg = EmailMultiAlternatives(f'Ememo {instance.number} {instance.step} ', 'email plain content', f'Ememo <{settings.DEFAULT_FROM_EMAIL}>',[to], cc, headers = {'Reply-To': settings.DEFAULT_FROM_EMAIL})
         msg.attach_alternative(html_content, "text/html")
         if flow.sendPDF:
             print("sennding email with pdf")
@@ -72,12 +73,29 @@ def change_step(sender, instance, **kwargs):
 
             base_url = os.getenv("FRONTEND_URL")
             html = HTML(string=rendered, base_url=base_url, url_fetcher=url_fetcher)
-            
+
             pdFile =  html.write_pdf()
             msg.attach(f'ememo_{instance.number}.pdf', pdFile, 'application/pdf')
         return msg.send()
 
+from django_ses.signals import bounce_received, complaint_received, send_received, delivery_received
+@receiver(bounce_received)
+def bounce_handler(sender, mail_obj, bounce_obj, raw_message, *args, **kwargs):
+    # you can then use the message ID and/or recipient_list(email address) to identify any problematic email messages that you have sent
+    message_id = mail_obj['messageId']
+    recipient_list = mail_obj['destination']
+    print( recipient_list)
+    print("This is bounce email object")
+    print(mail_obj)
 
+@receiver(complaint_received)
+def complaint_handler(sender, mail_obj, complaint_obj, raw_message,  *args, **kwargs):
+     print('complain')
 
+@receiver(send_received)
+def send_handler(sender, mail_obj, raw_message,  *args, **kwargs):
+     print('send_received')
 
-
+@receiver(delivery_received)
+def delivery_handler(sender, mail_obj, delivery_obj, raw_message,  *args, **kwargs):
+      print('send_received')

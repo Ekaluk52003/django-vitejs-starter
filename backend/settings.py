@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     'django_fsm_log',
     'storages',
     'hijack',
-    'hijack.contrib.admin'
+    'hijack.contrib.admin',
+    'django_ses'
 
 
 ]
@@ -172,7 +173,8 @@ if FILE_UPLOAD_STORAGE == "s3":
 
 
 
-DEFAULT_FROM_EMAIL = 'ekaluk.pong@yahoo.com'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+USE_SES_V2 = True
 
 # EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", default="local")
 # if  EMAIL_BACKEND == "ses":

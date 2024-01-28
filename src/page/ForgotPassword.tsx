@@ -1,10 +1,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Form } from "react-router-dom";
-// import { useActionData } from "react-router-dom";
+import { useActionData } from "react-router-dom";
 
 export default function ForgotPassword() {
-      //  const data =  useActionData()
+       const data =  useActionData()
   return (
     <div className='flex flex-col justify-center min-h-full px-6 py-12 lg:px-8'>
     <div className='sm:mx-auto sm:w-full sm:max-w-sm'>
@@ -28,8 +28,10 @@ export default function ForgotPassword() {
           Submit
         </Button>
       </Form>
-      {/* { data && data.message ? data.message :""}
-      { data && data.error ? data.error :""} */}
+       {/*// @ts-expect-error is ok */}
+      { data && data.message ? data.message :""}
+       {/*// @ts-expect-error is ok */}
+      { data && data.error ? data.error :""}
     </div>
 
 
