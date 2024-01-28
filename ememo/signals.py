@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from .models import Ememo, FlowEmemo
+from .models import Ememo, FlowEmemo, SNS
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 import qrcode
@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from weasyprint import HTML,  CSS
 import weasyprint
 import boto3
+
 from django.conf import settings
 
 s3 = boto3.client('s3',
@@ -81,21 +82,22 @@ def change_step(sender, instance, **kwargs):
 from django_ses.signals import bounce_received, complaint_received, send_received, delivery_received
 @receiver(bounce_received)
 def bounce_handler(sender, mail_obj, bounce_obj, raw_message, *args, **kwargs):
-    # you can then use the message ID and/or recipient_list(email address) to identify any problematic email messages that you have sent
-    message_id = mail_obj['messageId']
-    recipient_list = mail_obj['destination']
-    print( recipient_list)
-    print("This is bounce email object")
-    print(mail_obj)
+    SNS.objects.create(type="Bounce", destinationEmail=mail_obj['destination'], subject=mail_obj['headers'][2]['value'])
 
 @receiver(complaint_received)
 def complaint_handler(sender, mail_obj, complaint_obj, raw_message,  *args, **kwargs):
-     print('complain')
+    SNS.objects.create(type="Complaint", destinationEmail=mail_obj['destination'], subject=mail_obj['headers'][2]['value'])
 
 @receiver(send_received)
 def send_handler(sender, mail_obj, raw_message,  *args, **kwargs):
-     print('send_received')
+     print('adding to db send_received')
+     print(
+          "subject", mail_obj['headers'][2]['value']
+     )
+     SNS.objects.create(type="Send", destinationEmail=mail_obj['destination'], subject=mail_obj['headers'][2]['value'])
 
 @receiver(delivery_received)
 def delivery_handler(sender, mail_obj, delivery_obj, raw_message,  *args, **kwargs):
-      print('send_received')
+      print('adding to db received')
+      SNS.objects.create(type="Delivered", destinationEmail=mail_obj['destination'], subject=mail_obj['headers'][2]['value'])
+

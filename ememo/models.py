@@ -74,3 +74,15 @@ class Log(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
       return self.description
+
+class SNS(models.Model):
+
+    type = models.TextField(verbose_name="Type")
+    destinationEmail = models.TextField(verbose_name="DestinationEmail")
+    subject = models.TextField(verbose_name="Subject")
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        editable=False,
+    )
+    def __str__(self):
+      return self.type
