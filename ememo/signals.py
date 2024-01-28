@@ -50,7 +50,8 @@ def change_step(sender, instance, **kwargs):
      print("Instance target",instance.step)
      if flow.sendEmail :
         print("sennding email")
-        to = instance.assignnee.email
+        ## send to assignee if step !="DONE" and "REJECT"
+        to = instance.assignnee.email if instance.step != "DONE" and "Reject" else instance.author.email
         cc = flow.cc or None
         EmailContent = flow.contentEmail or None
         link = settings.FRONTEND_URL+'/dashboard/ememo/'+str(instance.number)
