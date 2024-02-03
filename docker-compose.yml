@@ -8,6 +8,8 @@ services:
       - POSTGRES_DB=tutorial
     ports:
       - "127.0.0.1:5433:5433"
+    volumes:
+        - pgdata:/var/lib/postgresql/data/
 
   web:
     build: .
@@ -27,7 +29,9 @@ services:
 
   caddy:
     image: caddy:2.4.5-alpine
-    restart: unless-stopped
+    restart: always
+    environment:
+      ACME_AGREE: "true"
     ports:
       - "80:80"
       - "443:443"
@@ -37,5 +41,8 @@ services:
       - ./caddy_config:/config
       - ./static:/static
     depends_on:
-      - db
       - web
+
+volumes:
+  pgdata:
+  caddy_data:
