@@ -8,5 +8,5 @@ handle_path /static {
 
 handle {
         reverse_proxy web:8000
-        tls ekaluk.p@gmail.com
+     
 }
