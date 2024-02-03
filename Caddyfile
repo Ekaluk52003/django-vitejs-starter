@@ -4,12 +4,3 @@ ekaluk.com {
   tls ekaluk.p@gmail.com
 }
 
-ekaluk.com/static/ {
-  root /code/staticfiles/
-  tls tls ekaluk.p@gmail.com
-}
-
-ekaluk.com/media/ {
-  root /code/media/
-  tls tls ekaluk.p@gmail.com
-}
