@@ -1,0 +1,14 @@
+localhost {
+  handle_path /static/* {
+    root * /static
+    file_server
+  }
+
+  @web {
+    not path /static/*
+  }
+
+  reverse_proxy @web {
+    to web:8000
+  }
+}

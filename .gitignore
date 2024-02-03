@@ -104,3 +104,7 @@ uploads/
 files/
 privates/
 migrations/
+caddy_config/
+caddy_data/
+postgres-data/
+.app.env

@@ -86,3 +86,12 @@ class SNS(models.Model):
     )
     def __str__(self):
       return self.type
+
+class Crontable(models.Model):
+    text = models.TextField(verbose_name="text")
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        editable=False,
+    )
+    def __str__(self):
+      return self.text

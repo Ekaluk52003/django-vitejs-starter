@@ -341,10 +341,9 @@ table td:not(.except-css) {
 
   </div>
 
-  {% if object.step == "DONE" %}
-  <p class="watermark">Approved</p>
-  {% else %}
-  <p class="watermark">Pending</p>
+  {% if step != "DONE" %}
+  <p class="watermark">Draft</p>
+
   {% endif %}
   <table class="invoice-info-container">
     <tr class="except-css">
@@ -434,7 +433,7 @@ table td:not(.except-css) {
           </div>
         </td>
         <td class="large except-css">{{ object.updated_at}}</td>
-        <td class="large total except-css alight-right">{{ object.step}}</td>
+        <td class="large total except-css alight-right">{{ step }}</td>
       </tr>
     </tbody>
   </table>

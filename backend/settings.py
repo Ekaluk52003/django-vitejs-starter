@@ -2,6 +2,8 @@ from pathlib import Path
 import os
 import dj_database_url
 from dotenv import load_dotenv
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
@@ -29,7 +31,9 @@ INSTALLED_APPS = [
     'storages',
     'hijack',
     'hijack.contrib.admin',
-    'django_ses'
+    'django_ses',
+    'django_cron',
+    'django_crontab'
 
 
 ]
@@ -85,6 +89,18 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "tutorial",
+#         "USER": "tutorial",
+#         "PASSWORD": "tutorial",
+#         "HOST": "db",  # set in docker-compose.yml
+#         "PORT": 5433,  # default postgres port
+#     }
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -199,3 +215,11 @@ LOGIN_REDIRECT_URL=f"{FRONTEND_URL}/dashboard/profile"
 # AWS Configuration sets name --> event-destinations
 AWS_SES_CONFIGURATION_SET="Emailnotice"
 
+
+# CRON_CLASSES = [
+#     "backend.cron_jobs.MyCronJob",
+# ]
+
+CRONJOBS = [
+    ('5 * * * *', 'backend.cron.cron_test'),
+]

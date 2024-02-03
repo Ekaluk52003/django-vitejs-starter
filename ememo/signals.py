@@ -68,7 +68,8 @@ def change_step(sender, instance, **kwargs):
             qr_code_image.save(buffer, format="PNG")
             qr_code_image_data = base64.b64encode(buffer.getvalue()).decode()
             object = get_object_or_404(Ememo, number=instance.number )
-            rendered  = render_to_string('ememo/PDF/ememo_report.html',  {'object':object, 'qr_code_image_data': qr_code_image_data })
+            step= instance.step
+            rendered  = render_to_string('ememo/PDF/ememo_report.html',  {'object':object, 'step':step, 'qr_code_image_data': qr_code_image_data })
 
             # base_url = "http://127.0.0.1:8000"
             # The base used to resolve relative URLs (e.g. in <img src="../foo.png">).

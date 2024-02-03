@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Ememo, FlowEmemo, Log, EmemoMedia, SNS
+from .models import Ememo, FlowEmemo, Log, EmemoMedia, SNS, Crontable
 from django.forms import TextInput, Textarea
 from django.db import models
 # Register your models here.
@@ -25,3 +25,7 @@ admin.site.register(EmemoMedia, EmemoMediaAdmin)
 class LogSNS(admin.ModelAdmin):
      list_display = ("type", "destinationEmail","subject","created_at")
 admin.site.register(SNS, LogSNS)
+
+class Cron(admin.ModelAdmin):
+     list_display = ("text", "created_at")
+admin.site.register(Crontable, Cron)
