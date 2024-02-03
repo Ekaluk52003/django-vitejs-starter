@@ -28,21 +28,23 @@ services:
       - db
 
   caddy:
-    image: caddy:2.4.5-alpine
+    image: abiosoft/caddy
+    depends_on:
+    - "web"
     restart: always
     environment:
       ACME_AGREE: "true"
     ports:
-      - "80:80"
-      - "443:443"
+    - "80:80"
+    - "443:443"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./caddy_data:/data
-      - ./caddy_config:/config
-      - ./static:/static
-    depends_on:
-      - web
+    - ./Caddyfile:/etc/Caddyfile
+    - caddy_certs:/root/.caddy
+    - media:/code/media
+    - static:/code/staticfiles
 
 volumes:
   pgdata:
-  caddy_data:
+  media:
+  static:
+  caddy_certs:

@@ -1,14 +1,15 @@
 ekaluk.com {
-  handle_path /static/* {
-    root * /static
-    file_server
-  }
+  bind {$ADDRESS}
+  proxy / web:8000
+  tls ekaluk.p@gmail.com
+}
 
-  @web {
-    not path /static/*
-  }
+ekaluk.com/static/ {
+  root /code/staticfiles/
+  tls tls ekaluk.p@gmail.com
+}
 
-  reverse_proxy @web {
-    to web:8000
-  }
+ekaluk.com/media/ {
+  root /code/media/
+  tls tls ekaluk.p@gmail.com
 }
