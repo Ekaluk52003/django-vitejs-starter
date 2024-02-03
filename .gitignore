@@ -108,3 +108,4 @@ caddy_config/
 caddy_data/
 postgres-data/
 .app.env
+Readme(backup).md
