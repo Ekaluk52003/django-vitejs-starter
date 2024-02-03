@@ -40,7 +40,7 @@ services:
       - 443:443
     depends_on:
       - db
-      - app
+      - web
 
 volumes:
   pgdata:
