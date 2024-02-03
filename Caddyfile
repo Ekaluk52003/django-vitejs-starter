@@ -1,14 +1,10 @@
-ekaluk.com {
-  handle_path /static/* {
-    root * /static
-    file_server
-  }
+ekaluk.com
 
-  @web {
-    not path /static/*
-  }
+handle_path /static {
+        root * /var/www/django
+        file_server
+}
 
-  reverse_proxy @web {
-    to web:8000
-  }
+handle {
+        reverse_proxy web:8000
 }
