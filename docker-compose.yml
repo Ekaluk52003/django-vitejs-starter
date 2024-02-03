@@ -27,24 +27,23 @@ services:
     depends_on:
       - db
 
-  caddy:
-    image: caddy:2.4.5-alpine
-    depends_on:
-    - "web"
+  proxy:
+    image: caddy:alpine
     restart: always
-    environment:
-      ACME_AGREE: "true"
-    ports:
-    - "80:80"
-    - "443:443"
     volumes:
-    - ./Caddyfile:/etc/Caddyfile
-    - caddy_certs:/root/.caddy
-    - media:/code/media
-    - static:/code/staticfiles
+      - caddy-data:/data
+      - caddy-config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - app-static:/var/www/django/static:ro
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - db
+      - app
 
 volumes:
   pgdata:
-  media:
-  static:
-  caddy_certs:
+  caddy-data: {}
+  caddy-config: {}
+  app-static: {}

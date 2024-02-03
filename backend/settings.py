@@ -11,10 +11,11 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(' ')
 # CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS')
-ALLOWED_HOSTS  = os.getenv('ALLOWED_HOSTS').split(' ')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
 # ALLOWED_HOSTS  = os.getenv('ALLOWED_HOSTS')
-
+SECURE_SSL_REDIRECT = False
 # Application definition
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
     'admin_interface',
@@ -38,12 +39,14 @@ INSTALLED_APPS = [
 
 
 ]
-X_FRAME_OPTIONS = "SAMEORIGIN"              # allows you to use modals insated of popups
-SILENCED_SYSTEM_CHECKS = ["security.W019"]  # ignores redundant warning messages
+# allows you to use modals insated of popups
+X_FRAME_OPTIONS = "SAMEORIGIN"
+# ignores redundant warning messages
+SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -84,7 +87,6 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-
 
 
 # DATABASES = {
@@ -173,7 +175,7 @@ AUTH_USER_MODEL = "api.CustomUser"
 FILE_UPLOAD_STORAGE = os.getenv("FILE_UPLOAD_STORAGE", default="local")
 
 
-if  FILE_UPLOAD_STORAGE == "local":
+if FILE_UPLOAD_STORAGE == "local":
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'uploads/'
 
@@ -188,10 +190,9 @@ if FILE_UPLOAD_STORAGE == "s3":
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
     AWS_S3_REGION = 'ap-southeast-1'
     AWS_DEFAULT_ACL = 'private'
-    #The number of seconds that a generated URL is valid for
+    # The number of seconds that a generated URL is valid for
     # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#configuration-settings
-    AWS_QUERYSTRING_EXPIRE = 5000 # seconds
-
+    AWS_QUERYSTRING_EXPIRE = 5000  # seconds
 
 
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
@@ -200,8 +201,8 @@ USE_SES_V2 = True
 # EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", default="local")
 # if  EMAIL_BACKEND == "ses":
 EMAIL_BACKEND = 'django_ses.SESBackend'
-AWS_SES_REGION_NAME =  os.getenv('AWS_SES_REGION_NAME')
-AWS_SES_REGION_ENDPOINT =  os.getenv('AWS_SES_REGION_ENDPOINT')
+AWS_SES_REGION_NAME = os.getenv('AWS_SES_REGION_NAME')
+AWS_SES_REGION_ENDPOINT = os.getenv('AWS_SES_REGION_ENDPOINT')
 AWS_SES_ACCESS_KEY_ID = os.getenv('AWS_SES_ACCESS_KEY_ID')
 AWS_SES_SECRET_ACCESS_KEY = os.getenv('AWS_SES_SECRET_ACCESS_KEY')
 
@@ -209,16 +210,16 @@ AWS_SES_SECRET_ACCESS_KEY = os.getenv('AWS_SES_SECRET_ACCESS_KEY')
 #     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
-FRONTEND_URL=os.getenv("FRONTEND_URL", default="http://127.0.0.1:8000")
+FRONTEND_URL = os.getenv("FRONTEND_URL", default="http://127.0.0.1:8000")
 
 
 HIJACK_PERMISSION_CHECK = "hijack.permissions.superusers_and_staff"
 # Redirect User after Hjack
-LOGIN_REDIRECT_URL=f"{FRONTEND_URL}/dashboard/profile"
+LOGIN_REDIRECT_URL = f"{FRONTEND_URL}/dashboard/profile"
 
 
 # AWS Configuration sets name --> event-destinations
-AWS_SES_CONFIGURATION_SET="Emailnotice"
+AWS_SES_CONFIGURATION_SET = "Emailnotice"
 
 
 # CRON_CLASSES = [
