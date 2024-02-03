@@ -28,7 +28,7 @@ services:
       - db
 
   caddy:
-    image: abiosoft/caddy
+    image: caddy:2.4.5-alpine
     depends_on:
     - "web"
     restart: always
