@@ -1,6 +1,6 @@
 ekaluk.com {
   handle_path /static/* {
-    root * /static
+    root * /code/static
     file_server
   }
 
