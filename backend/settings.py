@@ -221,10 +221,10 @@ LOGIN_REDIRECT_URL = f"{FRONTEND_URL}/dashboard/profile"
 AWS_SES_CONFIGURATION_SET = "Emailnotice"
 
 
-CRON_CLASSES = [
-    "backend.cron_jobs.MyCronJob",
-]
+# CRON_CLASSES = [
+#     "backend.cron_jobs.MyCronJob",
+# ]
 
 CRONJOBS = [
-    ('1 * * * *', 'backend.cron.cron_test'),
+    ('* * * * *', 'backend.cron.cron_test'),
 ]
