@@ -21,7 +21,7 @@ services:
     ports:
        - 8000:8000
     volumes:
-      - .:/code
+       - ./static:/code/static
     links:
       - db
     depends_on:
@@ -44,4 +44,4 @@ services:
 
 volumes:
   pgdata:
-
+  static:
