@@ -44,3 +44,6 @@ services:
 
 volumes:
   pgdata:
+  caddy-data: {}
+  caddy-config: {}
+  app-static: {}
