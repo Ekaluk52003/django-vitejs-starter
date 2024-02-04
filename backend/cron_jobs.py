@@ -11,7 +11,8 @@ class MyCronJob(CronJobBase):
 
     def do(self):
         print('running cron')   # do your thing here
-        Crontable.objects.create(text="run another cron")
+        newTex = Crontable.objects.create(text="django normal cron")
+        newTex.save()
         # twele_hour_ago = timezone.now() - timezone.timedelta(hours=12)
         # expired_logs = SNS.objects.filter(
         # created_at__lte=twele_hour_ago
