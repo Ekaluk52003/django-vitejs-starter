@@ -27,17 +27,17 @@ services:
     depends_on:
       - db
 
-  proxy:
-    image: caddy:alpine
-    restart: always
-    volumes:
-      - caddy-data:/data
-      - caddy-config:/config
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - app-static:/var/www/django/static:ro
+  caddy:
+    image: caddy:2.4.5-alpine
+    restart: unless-stopped
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+      - ./static:/static
     depends_on:
       - db
       - web
