@@ -42,8 +42,3 @@ services:
       - db
       - web
 
-volumes:
-  pgdata:
-  caddy-data: {}
-  caddy-config: {}
-  app-static: {}

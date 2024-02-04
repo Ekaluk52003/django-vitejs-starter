@@ -13,9 +13,7 @@ CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(' ')
 # CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS')
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
 # ALLOWED_HOSTS  = os.getenv('ALLOWED_HOSTS')
-SECURE_SSL_REDIRECT = False
-# Application definition
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 INSTALLED_APPS = [
     'admin_interface',
