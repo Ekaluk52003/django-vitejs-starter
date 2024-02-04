@@ -5,4 +5,5 @@ from django.utils import timezone
 
 def cron_test():
     print('running cron job')   # do your thing here
-    Crontable.objects.create(text="run another cron")
+    newTex = Crontable.objects.create(text="run another cron")
+    newTex.save()
