@@ -242,7 +242,8 @@ def ememo_signed_media(request, key: str):
 
     s3 = boto3.client('s3',
         aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+        endpoint_url=os.getenv('AWS_S3_ENDPOINT_URL')
     )
     obj = s3.get_object(
         Bucket=os.getenv('AWS_STORAGE_BUCKET_NAME'),
