@@ -226,5 +226,5 @@ AWS_SES_CONFIGURATION_SET = "Emailnotice"
 # ]
 
 CRONJOBS = [
-    ('* * * * *', 'backend.cron.cron_test'),
+    ('30 * * * *', 'backend.cron.cron_test'),
 ]
