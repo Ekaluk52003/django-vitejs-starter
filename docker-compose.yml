@@ -42,3 +42,6 @@ services:
       - db
       - web
 
+volumes:
+  pgdata:
+
