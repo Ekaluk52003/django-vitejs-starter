@@ -188,6 +188,7 @@ if FILE_UPLOAD_STORAGE == "s3":
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
     AWS_S3_REGION = 'ap-southeast-1'
     AWS_DEFAULT_ACL = 'private'
+    AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
     # The number of seconds that a generated URL is valid for
     # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#configuration-settings
     AWS_QUERYSTRING_EXPIRE = 5000  # seconds
