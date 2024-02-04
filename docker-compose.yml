@@ -15,13 +15,14 @@ services:
     build: .
     restart: unless-stopped
     # command: gunicorn backend.wsgi:application -w 4 -b 0.0.0.0:8000
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn --workers=3 backend.wsgi -b 0.0.0.0:8000"
+    command: bash -c "python manage.py migrate && gunicorn --workers=3 backend.wsgi -b 0.0.0.0:8000"
     env_file:
       - .env
     ports:
        - 8000:8000
     volumes:
-       - ./static:/code/static
+      - .:/code
+      - static:/app/code/assets
     links:
       - db
     depends_on:
@@ -37,7 +38,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy_data:/data
       - ./caddy_config:/config
-      - ./static:/code/static
+      - static:/app/code/assets
     depends_on:
       - db
       - web
