@@ -226,5 +226,5 @@ CRON_CLASSES = [
 ]
 
 CRONJOBS = [
-    ('5 * * * *', 'backend.cron.cron_test'),
+    ('1 * * * *', 'backend.cron.cron_test'),
 ]
