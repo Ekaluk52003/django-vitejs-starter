@@ -22,7 +22,7 @@ services:
        - 8000:8000
     volumes:
       - .:/code
-      - static:/code/static
+
     links:
       - db
     depends_on:
@@ -38,11 +38,10 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy_data:/data
       - ./caddy_config:/config
-      - static:/code/static
+
     depends_on:
       - db
       - web
 
 volumes:
   pgdata:
-  static:
