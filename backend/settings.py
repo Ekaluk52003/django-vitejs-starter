@@ -230,6 +230,12 @@ CRONJOBS = [
 ]
 
 
+def backup_filename(databasename, servername, datetime, extension, content_type):
+    return f"{content_type}-{datetime}.{extension}"
+
+DBBACKUP_FILENAME_TEMPLATE = backup_filename
+
+
 DBBACKUP_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 DBBACKUP_STORAGE_OPTIONS = {
     'access_key': os.getenv('AWS_ACCESS_KEY_ID'),
