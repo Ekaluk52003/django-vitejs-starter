@@ -33,8 +33,8 @@ INSTALLED_APPS = [
     'hijack.contrib.admin',
     'django_ses',
     'django_cron',
-    'django_crontab'
-
+    'django_crontab',
+    'dbbackup'
 
 ]
 # allows you to use modals insated of popups
@@ -228,3 +228,13 @@ AWS_SES_CONFIGURATION_SET = "Emailnotice"
 CRONJOBS = [
     ('30 * * * *', 'backend.cron.cron_test'),
 ]
+
+
+DBBACKUP_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DBBACKUP_STORAGE_OPTIONS = {
+    'access_key': os.getenv('AWS_ACCESS_KEY_ID'),
+    'secret_key': os.getenv('AWS_SECRET_ACCESS_KEY'),
+    'bucket_name': os.getenv('AWS_STORAGE_BUCKET_NAME'),
+    'default_acl': 'private',
+    'location': 'db/'
+}
