@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.9
+ARG PYTHON_VERSION=3.8.6-buster
 # work with cron =3.8.6-buster
 # ARG PYTHON_VERSION=3.9-slim-bullseye
 
@@ -9,8 +9,8 @@ ENV PYTHONUNBUFFERED 1
 
 # install psycopg2 dependencies.
 RUN apt-get update && apt-get install -y \
-    cron \
     postgres-client \
+    cron \
     fonts-thai-tlwg \
     libpq-dev \
     gcc \
