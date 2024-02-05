@@ -1,5 +1,5 @@
-ARG PYTHON_VERSION=3.8.6-buster
-# not work with cron 3.9-slim-bullseye
+ARG PYTHON_VERSION=3.9
+# work with cron =3.8.6-buster
 # ARG PYTHON_VERSION=3.9-slim-bullseye
 
 FROM python:${PYTHON_VERSION}
@@ -10,14 +10,13 @@ ENV PYTHONUNBUFFERED 1
 # install psycopg2 dependencies.
 RUN apt-get update && apt-get install -y \
     cron \
+    postgres-client \
     fonts-thai-tlwg \
+    libpq-dev \
     gcc \
     python3-pip python3-cffi python3-brotli libpango-1.0-0 libpangoft2-1.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client
 
 
 RUN mkdir -p /code
