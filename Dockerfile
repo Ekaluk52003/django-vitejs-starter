@@ -9,7 +9,6 @@ ENV PYTHONUNBUFFERED 1
 
 # install psycopg2 dependencies.
 RUN apt-get update && apt-get install -y \
-    postgres-client \
     cron \
     fonts-thai-tlwg \
     libpq-dev \
@@ -17,7 +16,9 @@ RUN apt-get update && apt-get install -y \
     python3-pip python3-cffi python3-brotli libpango-1.0-0 libpangoft2-1.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-
+RUN apk add --no-cache \
+    postgresql-client \
+    postgresql-dev 
 
 RUN mkdir -p /code
 
