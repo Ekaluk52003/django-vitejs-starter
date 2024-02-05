@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.8.6-buster
+ARG PYTHON_VERSION=3.9-bullseye
 # work with cron =3.8.6-buster
 # ARG PYTHON_VERSION=3.9-slim-bullseye
 
