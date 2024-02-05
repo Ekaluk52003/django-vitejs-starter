@@ -15,10 +15,8 @@ RUN apt-get update && apt-get install -y \
     gcc \
     python3-pip python3-cffi python3-brotli libpango-1.0-0 libpangoft2-1.0-0 \
     && rm -rf /var/lib/apt/lists/*
-
-RUN apk add --no-cache \
-    postgresql-client \
-    postgresql-dev 
+    
+RUN pip install postgres-client
 
 RUN mkdir -p /code
 
