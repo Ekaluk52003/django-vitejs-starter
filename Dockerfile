@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED 1
 
 # install psycopg2 dependencies.
 RUN apt-get update && apt-get install -y \
-    apt-get install postgresql-client \
+    postgresql-client \
     cron \
     fonts-thai-tlwg \
     libpq-dev \
